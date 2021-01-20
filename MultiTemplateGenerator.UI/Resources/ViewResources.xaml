@@ -1,0 +1,203 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:MultiTemplateGenerator.UI.Controls;assembly=MultiTemplateGenerator.UI"
+    xmlns:converters="clr-namespace:MultiTemplateGenerator.UI.Converters;assembly=MultiTemplateGenerator.UI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:models="clr-namespace:MultiTemplateGenerator.UI.Models;assembly=MultiTemplateGenerator.UI"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:viewModels="clr-namespace:MultiTemplateGenerator.UI.ViewModels;assembly=MultiTemplateGenerator.UI"
+    d1p1:Ignorable="d">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+        <materialDesign:BundledTheme
+            BaseTheme="Dark"
+            PrimaryColor="DeepPurple"
+            SecondaryColor="Purple" />
+        <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.dark.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/materialdesigncolor.purple.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/materialdesigncolor.deeppurple.xaml" />-->
+    </ResourceDictionary.MergedDictionaries>
+
+    <viewModels:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
+
+    <system:Boolean x:Key="FalseValue">False</system:Boolean>
+    <system:Boolean x:Key="TrueValue">True</system:Boolean>
+
+    <converters:ColorZoneDarkModeConverter x:Key="ColorZoneDarkModeConverter" />
+
+    <converters:BoolConverter
+        x:Key="InvertBoolConverter"
+        FalseValue="{StaticResource TrueValue}"
+        TrueValue="{StaticResource FalseValue}" />
+
+    <converters:VisibilityConverter x:Key="BoolVisibilityConverter" />
+    <!--<converters:VisibilityConverter x:Key="BoolVisibilityHiddenConverter" FalseValue="Hidden" />-->
+    <converters:VisibilityConverter
+        x:Key="InvertBoolVisibilityConverter"
+        FalseValue="Visible"
+        TrueValue="Collapsed" />
+
+    <!--<Style
+        x:Key="BrowseButton"
+        BasedOn="{StaticResource MaterialDesignFloatingActionMiniDarkButton}"
+        TargetType="{x:Type Button}">
+        <Setter Property="Margin" Value="5,0,0,0" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Content">
+            <Setter.Value>
+                <Image Source="folder-icon-32.png" />
+            </Setter.Value>
+        </Setter>
+    </Style>-->
+
+    <Style BasedOn="{StaticResource MaterialDesignCaptionHyperlink}" TargetType="{x:Type Hyperlink}">
+        <!--<Setter Property="Margin" Value="0,0,5,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />-->
+    </Style>
+
+    <Style BasedOn="{StaticResource MaterialDesignLabel}" TargetType="{x:Type Label}">
+        <Setter Property="Margin" Value="0,0,5,0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="{x:Type Button}">
+        <Setter Property="Margin" Value="5,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style BasedOn="{StaticResource MaterialDesignTextBox}" TargetType="{x:Type TextBox}">
+        <Setter Property="Margin" Value="0,2,0,2" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style BasedOn="{StaticResource MaterialDesignComboBox}" TargetType="{x:Type ComboBox}">
+        <Setter Property="Margin" Value="0,2,0,2" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style BasedOn="{StaticResource MaterialDesignCheckBox}" TargetType="{x:Type CheckBox}">
+        <Setter Property="Margin" Value="0,0,10,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="TemplateImageStyle" TargetType="Image">
+        <Setter Property="Width" Value="26" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Margin" Value="0,0,5,0" />
+    </Style>
+
+    <Style
+        x:Key="TreeViewStyle"
+        BasedOn="{StaticResource MaterialDesignTreeView}"
+        TargetType="{x:Type TreeView}">
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+        <Style.Resources>
+            <Style BasedOn="{StaticResource MaterialDesignTreeViewItem}" TargetType="{x:Type TreeViewItem}">
+                <Setter Property="IsExpanded" Value="True" />
+                <Setter Property="Padding" Value="5" />
+            </Style>
+        </Style.Resources>
+    </Style>
+
+    <Style x:Key="BrowseTextBox" TargetType="{x:Type controls:SearchTextBox}">
+        <Setter Property="SearchMode" Value="Regular" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Kind" Value="FolderOpen" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:SearchTextBox}">
+                    <Grid Margin="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox
+                            Width="Auto"
+                            Height="25"
+                            Margin="0"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Hint="{Binding (materialDesign:HintAssist.Hint), RelativeSource={RelativeSource TemplatedParent}}"
+                            materialDesign:TextFieldAssist.HasClearButton="{Binding (materialDesign:TextFieldAssist.HasClearButton), RelativeSource={RelativeSource TemplatedParent}}"
+                            Foreground="{TemplateBinding Foreground}"
+                            Style="{StaticResource MaterialDesignTextBox}"
+                            Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource TemplatedParent}}" />
+
+                        <StackPanel
+                            Grid.Column="1"
+                            Width="Auto"
+                            Height="Auto"
+                            Margin="3,0,3,0"
+                            VerticalAlignment="Center">
+                            <Button
+                                Grid.Column="1"
+                                Width="25"
+                                Height="25"
+                                Margin="0"
+                                Padding="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Panel.ZIndex="1"
+                                Command="{TemplateBinding Command}"
+                                Cursor="Hand"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsTabStop="False"
+                                Style="{StaticResource MaterialDesignFlatButton}">
+                                <materialDesign:PackIcon
+                                    Width="Auto"
+                                    Height="Auto"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Kind="{Binding Kind, RelativeSource={RelativeSource TemplatedParent}}" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style
+        x:Key="OpenFileTextBox"
+        BasedOn="{StaticResource BrowseTextBox}"
+        TargetType="{x:Type controls:SearchTextBox}">
+        <Setter Property="Kind" Value="FileFind" />
+    </Style>
+    <Style
+        x:Key="OpenImageTextBox"
+        BasedOn="{StaticResource BrowseTextBox}"
+        TargetType="{x:Type controls:SearchTextBox}">
+        <Setter Property="Kind" Value="ImageSearch" />
+    </Style>
+
+    <Style
+        x:Key="CheckComboBox"
+        BasedOn="{StaticResource MaterialDesignComboBox}"
+        TargetType="{x:Type ComboBox}">
+        <Setter Property="Margin" Value="0,2,0,2" />
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate DataType="models:CheckedItemModel">
+                    <CheckBox Content="{Binding Text}" IsChecked="{Binding IsChecked}" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="SelectedItem" Value="{x:Null}">
+                <Setter Property="Text" Value="No Tags Selected" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

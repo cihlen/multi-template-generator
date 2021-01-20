@@ -1,0 +1,19 @@
+﻿<Application
+    x:Class="MultiTemplateGenerator.App.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MultiTemplateGenerator.App"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme
+                    BaseTheme="Dark"
+                    PrimaryColor="DeepPurple"
+                    SecondaryColor="Purple" />
+                <ResourceDictionary Source="/MultiTemplateGenerator.UI;component/Resources/ViewResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

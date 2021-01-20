@@ -1,0 +1,159 @@
+﻿<UserControl
+    x:Class="MultiTemplateGenerator.UI.Views.AboutView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:MultiTemplateGenerator.UI.Helpers"
+    xmlns:local="clr-namespace:MultiTemplateGenerator.UI.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:MultiTemplateGenerator.UI.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewModels:AboutViewModel}"
+    d:DesignWidth="500"
+    Background="{DynamicResource MaterialDesignPaper}"
+    FontFamily="{DynamicResource MaterialDesignFont}"
+    TextElement.FontSize="13"
+    TextElement.FontWeight="Regular"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="Auto"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Vertical" />
+        </Style>
+    </UserControl.Resources>
+    <GroupBox Header="About Multi-Template Generator">
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" MinHeight="5" />
+                    <RowDefinition Height="Auto" MinHeight="5" />
+                    <RowDefinition Height="Auto" MinHeight="5" />
+                    <RowDefinition Height="Auto" MinHeight="5" />
+                    <RowDefinition Height="Auto" MinHeight="5" />
+                    <RowDefinition Height="Auto" MinHeight="5" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="3" />
+                    </Style>
+                </Grid.Resources>
+
+                <materialDesign:ColorZone
+                    Grid.ColumnSpan="2"
+                    Margin="0"
+                    Padding="5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Mode="{Binding IsDarkMode, Converter={StaticResource ColorZoneDarkModeConverter}}">
+                    <Button
+                        Width="Auto"
+                        Height="Auto"
+                        Background="Transparent"
+                        Command="{Binding OpenInternetCommand}"
+                        CommandParameter="{x:Static helpers:AppUrls.HomePageUrl}"
+                        Cursor="Hand"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        ToolTip="Open Home Page">
+
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                            <Image
+                                Width="50"
+                                Height="50"
+                                Margin="0"
+                                Source="../Resources/MultiTemplateGenerator.png" />
+                            <TextBlock
+                                Margin="0"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="{DynamicResource MaterialDesignBody}"
+                                Text="Multi-Template Generator" />
+                        </StackPanel>
+                    </Button>
+                </materialDesign:ColorZone>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="0,10,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock>
+                        <Run Text="Version: " />
+                        <Run Text="{Binding AppVersion, Mode=OneWay}" />
+                    </TextBlock>
+                    <TextBlock Text="Copyright © Hans Christian Ihlen 2021" />
+                </StackPanel>
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Text="Author email:" />
+                <TextBlock Grid.Row="2" Grid.Column="1">
+                    <Hyperlink
+                        Command="{Binding OpenInternetCommand}"
+                        CommandParameter="mailto:cihlen@gmail.com"
+                        FontWeight="Bold">
+                        <Run Text="cihlen@gmail.com" />
+                    </Hyperlink>
+                </TextBlock>
+
+
+
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    VerticalAlignment="Top"
+                    Text="Documentation:" />
+                <StackPanel Grid.Row="3" Grid.Column="1">
+                    <TextBlock>
+                        <Hyperlink
+                            Command="{Binding OpenInternetCommand}"
+                            CommandParameter="{x:Static helpers:AppUrls.DocumentationUrl}"
+                            FontWeight="Bold">
+                            <Run Text="Online Documentation" />
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    VerticalAlignment="Top"
+                    Text="Support Development:" />
+                <StackPanel Grid.Row="4" Grid.Column="1">
+                    <TextBlock>
+                        <Hyperlink
+                            Command="{Binding OpenInternetCommand}"
+                            CommandParameter="{x:Static helpers:AppUrls.DonateUrl}"
+                            FontWeight="Bold">
+                            <Run Text="Donate" />
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+
+            </Grid>
+            <StackPanel
+                Grid.Row="1"
+                Margin="5,10,5,5"
+                VerticalAlignment="Bottom">
+                <Button
+                    Width="90"
+                    Command="{Binding CloseCommand}"
+                    Content="Close" />
+            </StackPanel>
+        </Grid>
+    </GroupBox>
+</UserControl>

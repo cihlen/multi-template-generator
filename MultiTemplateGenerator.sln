@@ -3,18 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGeneratorVS", "MultiTemplateGeneratorVS\MultiTemplateGeneratorVS.csproj", "{7E54FF91-BA8E-443F-B83C-876707B7A1A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.VS", "MultiTemplateGenerator.VS\MultiTemplateGenerator.VS.csproj", "{7E54FF91-BA8E-443F-B83C-876707B7A1A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGeneratorLib", "MultiTemplateGeneratorLib\MultiTemplateGeneratorLib.csproj", "{604AD102-2BEC-4E1C-8E3E-E1EC0ABD055E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.Lib", "MultiTemplateGenerator.Lib\MultiTemplateGenerator.Lib.csproj", "{604AD102-2BEC-4E1C-8E3E-E1EC0ABD055E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{A58C19CF-05D7-4F4A-BF23-539C13E205A2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGeneratorTests", "MultiTemplateGeneratorTests\MultiTemplateGeneratorTests.csproj", "{2D6D3DD1-7D8B-42F1-BD28-5FC6516397BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.Lib.Tests", "MultiTemplateGenerator.Lib.Tests\MultiTemplateGenerator.Lib.Tests.csproj", "{2D6D3DD1-7D8B-42F1-BD28-5FC6516397BE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{B7BC11D0-9B19-46BA-8616-1859393A5E57}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.UI", "MultiTemplateGenerator.UI\MultiTemplateGenerator.UI.csproj", "{195B977C-1282-4DD9-960D-6ED7D7C40E1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.App", "MultiTemplateGenerator.App\MultiTemplateGenerator.App.csproj", "{A69083B0-A649-4350-BC9A-BAD712246477}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,14 +32,18 @@ Global
 		{604AD102-2BEC-4E1C-8E3E-E1EC0ABD055E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{604AD102-2BEC-4E1C-8E3E-E1EC0ABD055E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{604AD102-2BEC-4E1C-8E3E-E1EC0ABD055E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A58C19CF-05D7-4F4A-BF23-539C13E205A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A58C19CF-05D7-4F4A-BF23-539C13E205A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A58C19CF-05D7-4F4A-BF23-539C13E205A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A58C19CF-05D7-4F4A-BF23-539C13E205A2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D6D3DD1-7D8B-42F1-BD28-5FC6516397BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2D6D3DD1-7D8B-42F1-BD28-5FC6516397BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D6D3DD1-7D8B-42F1-BD28-5FC6516397BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D6D3DD1-7D8B-42F1-BD28-5FC6516397BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{195B977C-1282-4DD9-960D-6ED7D7C40E1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{195B977C-1282-4DD9-960D-6ED7D7C40E1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{195B977C-1282-4DD9-960D-6ED7D7C40E1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{195B977C-1282-4DD9-960D-6ED7D7C40E1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A69083B0-A649-4350-BC9A-BAD712246477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A69083B0-A649-4350-BC9A-BAD712246477}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A69083B0-A649-4350-BC9A-BAD712246477}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A69083B0-A649-4350-BC9A-BAD712246477}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

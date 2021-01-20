@@ -1,0 +1,33 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>DeplWapProjTemplate</Name>
+    <Description>&lt;No description available&gt;</Description>
+    <DefaultName>DeplWapProjTemplate</DefaultName>
+    <ProjectType>CSharp</ProjectType>
+    <LanguageTag>C#</LanguageTag>
+    <CreateNewFolder>true</CreateNewFolder>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <SortOrder>1000</SortOrder>
+    <CreateInPlace>true</CreateInPlace>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <Icon>__TemplateIcon.png</Icon>
+    <PreviewImage>__PreviewImage.png</PreviewImage>
+    <Hidden>false</Hidden>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="DeplWapProjTemplate.wapproj" File="DeplWapProjTemplate.wapproj" ReplaceParameters="true">
+      <Folder Name="Images" TargetFolderName="Images">
+        <ProjectItem ReplaceParameters="true" TargetFileName="LockScreenLogo.scale-200.png">LockScreenLogo.scale-200.png</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SplashScreen.scale-200.png">SplashScreen.scale-200.png</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Square150x150Logo.scale-200.png">Square150x150Logo.scale-200.png</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Square44x44Logo.scale-200.png">Square44x44Logo.scale-200.png</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Square44x44Logo.targetsize-24_altform-unplated.png">Square44x44Logo.targetsize-24_altform-unplated.png</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="StoreLogo.png">StoreLogo.png</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Wide310x150Logo.scale-200.png">Wide310x150Logo.scale-200.png</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="DeplWapProjTemplate.wapproj">DeplWapProjTemplate.wapproj</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Package.appxmanifest">Package.appxmanifest</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MultiTemplateGenerator.UI</RootNamespace>
+    <AssemblyName>MultiTemplateGenerator.UI</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <ProjectGuid>{195B977C-1282-4DD9-960D-6ED7D7C40E1F}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\MultiTemplateGenerator.png" />
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="Resources\ViewResources.xaml" />
+    <Page Include="Views\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BusyControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProjectDetails.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MultiTemplateView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Key.snk" Link="Key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FontAwesome.WPF">
+      <Version>4.7.0.9</Version>
+    </PackageReference>
+    <PackageReference Include="MaterialDesignColors" Version="1.2.7" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.2.0" />
+    <PackageReference Include="MvvmLightLibs">
+      <Version>5.4.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\MultiTemplateGenerator.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\ViewResources.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\SearchTextBox.cs" />
+    <Compile Include="Converters\BoolConverter.cs" />
+    <Compile Include="Converters\ColorZoneDarkModeConverter.cs" />
+    <Compile Include="Converters\ForegroundDarkModeConverter.cs" />
+    <Compile Include="Converters\VisibilityConverter.cs" />
+    <Compile Include="Extensions\ImageExtensions.cs" />
+    <Compile Include="Extensions\MessageBoxExtensions.cs" />
+    <Compile Include="Extensions\ModelExtensions.cs" />
+    <Compile Include="Extensions\ProjectTemplateConverter.cs" />
+    <Compile Include="Helpers\AppHelper.cs" />
+    <Compile Include="Helpers\AppUrls.cs" />
+    <Compile Include="Helpers\JsonFileHelper.cs" />
+    <Compile Include="Helpers\LoggerHelper.cs" />
+    <Compile Include="Helpers\ProcessHelper.cs" />
+    <Compile Include="Helpers\Views.cs" />
+    <Compile Include="Models\AppSettings.cs" />
+    <Compile Include="Models\CheckedItemModel.cs" />
+    <Compile Include="Models\IChecked.cs" />
+    <Compile Include="Models\ProjectTemplateModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ProjectDetails.xaml.cs">
+      <DependentUpon>ProjectDetails.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ProjectSelectView.xaml.cs">
+      <DependentUpon>ProjectSelectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <DependentUpon>Settings.settings</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ViewModels\AboutViewModel.cs" />
+    <Compile Include="ViewModels\BusyViewModel.cs" />
+    <Compile Include="ViewModels\CommonViewModel.cs" />
+    <Compile Include="ViewModels\GeneratorViewModel.cs" />
+    <Compile Include="ViewModels\ProjectDetailsViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Compile Include="Helpers\InvokeHelper.cs" />
+    <Compile Include="Views\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BusyControl.xaml.cs">
+      <DependentUpon>BusyControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProjectDetails.xaml.cs">
+      <DependentUpon>ProjectDetails.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MultiTemplateView.xaml.cs">
+      <DependentUpon>MultiTemplateView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\ProjectDetails.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ProjectSelectView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MultiTemplateGenerator.Lib\MultiTemplateGenerator.Lib.csproj">
+      <Project>{604ad102-2bec-4e1c-8e3e-e1ec0abd055e}</Project>
+      <Name>MultiTemplateGenerator.Lib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

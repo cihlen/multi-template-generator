@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MultiTemplateGenerator.UI.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="OutputPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AutoImportToVS" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="OpenGeneratedTemplate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DefaultPlatformTags" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Android,Azure,iOS,Linux,macOS,tvOS,Windows,Xbox</Value>
+    </Setting>
+    <Setting Name="DefaultProjectTypeTags" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Cloud,Console,Desktop,Extensions,Games,IoT,Library,Machine Learning,Mobile,Office,Other,Service,Test,UWP,Web</Value>
+    </Setting>
+    <Setting Name="DefaultLanguageTags" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">None,C#,C++,F#,Java,JavaScript,Python,Query Language,TypeScript,Visual Basic</Value>
+    </Setting>
+    <Setting Name="IsDarkMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

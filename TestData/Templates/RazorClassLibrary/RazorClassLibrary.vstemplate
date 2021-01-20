@@ -1,0 +1,29 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>RazorClassLibrary</Name>
+    <Description>&lt;No description available&gt;</Description>
+    <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>RazorClassLibrary</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="RazorClassLibrary1.csproj" File="RazorClassLibrary1.csproj" ReplaceParameters="true">
+      <Folder Name="wwwroot" TargetFolderName="wwwroot">
+        <ProjectItem ReplaceParameters="false" TargetFileName="background.png">background.png</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="exampleJsInterop.js">exampleJsInterop.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="styles.css">styles.css</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="false" TargetFileName="_Imports.razor">_Imports.razor</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Component1.razor">Component1.razor</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="ExampleJsInterop.cs">ExampleJsInterop.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>
