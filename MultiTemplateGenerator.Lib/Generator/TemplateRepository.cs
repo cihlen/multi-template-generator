@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Xml;
+using MultiTemplateGenerator.Lib.Helpers;
 using MultiTemplateGenerator.Lib.Models;
 using MultiTemplateGenerator.Lib.SolutionParser;
 
@@ -16,12 +18,29 @@ namespace MultiTemplateGenerator.Lib.Generator
         IProjectTemplate ReadProjectTemplate(string templateFilePath);
         IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent);
         IProjectTemplate ReadSolutionTemplate(string templateFileName);
+        bool IsTagsSupported { get; }
     }
 
     public class TemplateRepository : ITemplateRepository
     {
+        public TemplateRepository()
+        {
+            try
+            {
+                RunningVSVersion = VSHelper.GetCurrentVSVersion();
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e);
+            }
+        }
         public string VSTemplateVersion { get; set; } = "3.0.0";
-        public bool Is2019OrNewer => VSTemplateVersion.Equals("3.0.0");
+
+        public Version RunningVSVersion { get; set; } = new Version(16, 8, 0);
+
+        private readonly Version _tagsSupportMinVersion = new Version(16, 1, 2);
+
+        public bool IsTagsSupported => RunningVSVersion >= _tagsSupportMinVersion;
 
         public void CreateSolutionTemplate(string solutionTemplateFile, IProjectTemplate solutionTemplate, IEnumerable<IProjectTemplate> projectTemplates)
         {
@@ -139,10 +158,14 @@ namespace MultiTemplateGenerator.Lib.Generator
             sw.WriteLine($"    <Description>{template.Description.XmlEncode()}</Description>");
             sw.WriteLine($"    <DefaultName>{template.DefaultName.XmlEncode()}</DefaultName>");
             sw.WriteLine($"    <ProjectType>{template.ProjectType ?? "CSharp"}</ProjectType>");
-            if (Is2019OrNewer)
+            if (!string.IsNullOrEmpty(template.ProjectSubType))
+                sw.WriteLine($"    <ProjectSubType>{template.ProjectSubType.XmlEncode()}</ProjectSubType>");
+
+            if (IsTagsSupported)
             {
-                if (!string.IsNullOrEmpty(template.ProjectSubType))
-                    sw.WriteLine($"    <ProjectSubType>{template.ProjectSubType.XmlEncode()}</ProjectSubType>");
+                /*
+                 * Starting in Visual Studio 2019 version 16.1 Preview 2, you can add language, platform, and project type tags to your project templates.
+                 */
                 if (!string.IsNullOrEmpty(template.LanguageTag) && !template.LanguageTag.Equals("None"))
                     sw.WriteLine($"    <LanguageTag>{template.LanguageTag}</LanguageTag>");
                 foreach (var platformTag in template.PlatformTags.GetTags())

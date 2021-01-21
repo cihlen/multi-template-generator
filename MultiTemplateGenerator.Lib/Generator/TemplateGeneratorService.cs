@@ -13,8 +13,9 @@ namespace MultiTemplateGenerator.Lib.Generator
     {
         IEnumerable<IProjectTemplate> GetProjectTemplatesFromFolder(string destFolder);
         List<IProjectTemplate> GetProjectTemplates(string solutionFile, IProjectTemplate solutionTemplate);
-        IProjectTemplate ReadSolutionTemplate(string solutionTemplateFile); 
+        IProjectTemplate ReadSolutionTemplate(string solutionTemplateFile);
         void GenerateTemplate(TemplateOptions generateOptions, CancellationToken cancellationToken);
+        bool IsTagsSupported { get; }
     }
 
     public class TemplateGeneratorService : ITemplateGeneratorService
@@ -132,6 +133,8 @@ namespace MultiTemplateGenerator.Lib.Generator
 
             _logger.Information("Generating templates completed");
         }
+
+        public bool IsTagsSupported => _templateGenerator.IsTagsSupported;
 
         public IEnumerable<IProjectTemplate> GetProjectTemplatesFromFolder(string destFolder)
         {

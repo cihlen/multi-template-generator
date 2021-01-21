@@ -122,6 +122,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public string VSTemplateFolder { get; private set; }
 
+        public bool IsTagsSupported => _generatorService.IsTagsSupported;
+
         public void SolutionPropertyChanged(ProjectTemplateModel template, string propertyName)
         {
             try

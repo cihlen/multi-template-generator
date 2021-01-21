@@ -323,22 +323,26 @@
                         <Label
                             Grid.Row="6"
                             Grid.Column="0"
-                            Content="Language:" />
+                            Content="Language:"
+                            IsEnabled="{Binding IsTagsSupported, Mode=OneWay}" />
                         <ComboBox
                             Grid.Row="6"
                             Grid.Column="1"
+                            IsEnabled="{Binding IsTagsSupported, Mode=OneWay}"
                             ItemsSource="{Binding SolutionTemplate.LanguageTags}"
                             SelectedValue="{Binding SolutionTemplate.LanguageTag}" />
                         <Label
                             Grid.Row="6"
                             Grid.Column="2"
                             Margin="5,0"
-                            Content="Platform Tags:" />
+                            Content="Platform Tags:"
+                            IsEnabled="{Binding IsTagsSupported, Mode=OneWay}" />
                         <ComboBox
                             Grid.Row="6"
                             Grid.Column="3"
                             Grid.ColumnSpan="2"
                             IsEditable="True"
+                            IsEnabled="{Binding IsTagsSupported, Mode=OneWay}"
                             ItemsSource="{Binding SolutionTemplate.PlatformTagsList, Mode=OneWay}"
                             Style="{DynamicResource CheckComboBox}"
                             Text="{Binding SolutionTemplate.PlatformTags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -354,11 +358,13 @@
                         <Label
                             Grid.Row="7"
                             Grid.Column="0"
-                            Content="Project Type Tags:" />
+                            Content="Project Type Tags:"
+                            IsEnabled="{Binding IsTagsSupported, Mode=OneWay}" />
                         <ComboBox
                             Grid.Row="7"
                             Grid.Column="1"
                             IsEditable="True"
+                            IsEnabled="{Binding IsTagsSupported, Mode=OneWay}"
                             ItemsSource="{Binding SolutionTemplate.ProjectTypeTagsList, Mode=OneWay}"
                             Style="{DynamicResource CheckComboBox}"
                             Text="{Binding SolutionTemplate.ProjectTypeTags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
