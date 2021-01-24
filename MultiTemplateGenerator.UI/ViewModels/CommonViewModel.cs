@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using MultiTemplateGenerator.Lib;
 using MultiTemplateGenerator.UI.Helpers;
@@ -27,7 +27,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 message = exception.Message;
 
             Logger.Error(exception, message);
-            message.ShowErrorMessageBox();
+            ShowError(message).Wait();
         }
 
         protected virtual void SetError(string message)
@@ -36,6 +36,18 @@ namespace MultiTemplateGenerator.UI.ViewModels
             message.ShowErrorMessageBox();
         }
 
+        protected async Task<MessageBoxResult> ShowMessageBox(string message, string title = null, MessageBoxButton buttons = MessageBoxButton.OK,
+            MessageBoxImage messageBoxImage = MessageBoxImage.Information)
+        {
+            var msgVm = new MessageBoxViewModel(message, title, buttons, messageBoxImage);
+            await DialogHost.Show(msgVm, ViewNames.DialogRoot);
+            return msgVm.MessageBoxResult;
+        }
+
+        protected async Task ShowError(string message, string title = null)
+        {
+            await ShowMessageBox(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
         #region Open/Execute
 
         private RelayCommand<string> _openLocationCommand;

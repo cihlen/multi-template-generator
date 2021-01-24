@@ -9,7 +9,7 @@ namespace MultiTemplateGenerator.UI
     public static class ProjectTemplateConverter
     {
         public static readonly IEnumerable<string> PropertyExcludes =
-            new[] {"Parent", "Children", "IsProject", "ProjectItems"};
+            new[] { "Parent", "Children", "IsProject", "ProjectItems" };
 
         public static void CopyTemplateProperties(this IProjectTemplate source, IProjectTemplate target)
         {
@@ -44,7 +44,8 @@ namespace MultiTemplateGenerator.UI
             var model = new ProjectTemplate(item.IsProject);
 
             item.CopyTemplateProperties(model);
-            
+            model.IsHidden = true;
+
             return model;
         }
 

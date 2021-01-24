@@ -73,15 +73,22 @@ namespace MultiTemplateGenerator.Lib.Generator
             var solutionTemplate = options.SolutionTemplate;
             var destFolder = options.TargetFolder;
 
-            ct.ThrowIfCancellationRequested();
 
             //Delete any .zip or .vstemplate files
             var destDirInfo = new DirectoryInfo(destFolder);
-            var filesToDelete = destDirInfo.GetFiles("*.zip").ToList();
-            filesToDelete.AddRange(destDirInfo.GetFiles("*.vstemplate", SearchOption.AllDirectories).ToList());
-            foreach (var fileToDelete in filesToDelete)
+            if (destDirInfo.Exists)
             {
-                fileToDelete.Delete();
+                var filesToDelete = destDirInfo.GetFiles("*.zip").ToList();
+                filesToDelete.AddRange(destDirInfo.GetFiles("*.vstemplate", SearchOption.AllDirectories).ToList());
+                foreach (var fileToDelete in filesToDelete)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    fileToDelete.Delete();
+                }
+            }
+            else
+            {
+                destDirInfo.Create();
             }
 
             var multiTemplateFile = new FileInfo(options.TargetTemplatePath);

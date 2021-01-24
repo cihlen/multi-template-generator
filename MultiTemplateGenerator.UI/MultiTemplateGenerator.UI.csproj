@@ -43,6 +43,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -68,6 +69,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BusyControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MessageBoxDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -113,6 +118,7 @@
     <Compile Include="Converters\BoolConverter.cs" />
     <Compile Include="Converters\ColorZoneDarkModeConverter.cs" />
     <Compile Include="Converters\ForegroundDarkModeConverter.cs" />
+    <Compile Include="Converters\MessageBoxButtonVisibilityConverter.cs" />
     <Compile Include="Converters\VisibilityConverter.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\MessageBoxExtensions.cs" />
@@ -124,6 +130,7 @@
     <Compile Include="Helpers\LoggerHelper.cs" />
     <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="Helpers\Views.cs" />
+    <Compile Include="Helpers\WindowSettings.cs" />
     <Compile Include="Models\AppSettings.cs" />
     <Compile Include="Models\CheckedItemModel.cs" />
     <Compile Include="Models\IChecked.cs" />
@@ -157,6 +164,7 @@
     <Compile Include="ViewModels\BusyViewModel.cs" />
     <Compile Include="ViewModels\CommonViewModel.cs" />
     <Compile Include="ViewModels\GeneratorViewModel.cs" />
+    <Compile Include="ViewModels\MessageBoxViewModel.cs" />
     <Compile Include="ViewModels\ProjectDetailsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Helpers\InvokeHelper.cs" />
@@ -165,6 +173,9 @@
     </Compile>
     <Compile Include="Views\BusyControl.xaml.cs">
       <DependentUpon>BusyControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MessageBoxDialog.xaml.cs">
+      <DependentUpon>MessageBoxDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProjectDetails.xaml.cs">
       <DependentUpon>ProjectDetails.xaml</DependentUpon>

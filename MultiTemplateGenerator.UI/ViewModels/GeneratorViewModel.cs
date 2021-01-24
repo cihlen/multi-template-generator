@@ -31,12 +31,14 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private ProjectTemplateModel _solutionTemplate;
         private bool _isBusy;
         private bool _autoImportToVS;
-        private string _destinationFolder;
+        private string _outputPath;
         private bool _useSolution;
         private bool _autoOpenTemplate;
         private bool _isWindowOpen;
         private string _solutionFile;
         private string _currentVsTemplateFolder;
+        private int _projectTemplateCount;
+        private int _solutionFolderCount;
 
         protected CancellationTokenSource CancelSource;
 
@@ -49,6 +51,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private RelayCommand<object> _closeWindowCommand;
         private RelayCommand _refreshViewCommand;
         private RelayCommand<string> _openDialogCommand;
+        private RelayCommand<string> _deleteFolderContentCommand;
 
         public GeneratorViewModel(ITemplateGeneratorService generatorService, ILogger logger)
             : base(logger)
@@ -70,6 +73,182 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }
 
+        #region Properties
+
+        public bool IsDarkMode
+        {
+            get => _isDarkMode;
+            set
+            {
+                _isDarkMode = value;
+                ToggleDarkLightTheme(_isDarkMode);
+                RaisePropertyChanged();
+            }
+        }
+
+        public IBaseTheme BaseTheme
+        {
+            get => _baseTheme;
+            set
+            {
+                _baseTheme = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsAppMenuOpen
+        {
+            get => _isAppMenuOpen;
+            set
+            {
+                _isAppMenuOpen = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string VSTemplateFolder { get; private set; }
+
+        public bool IsTagsSupported => _generatorService.IsTagsSupported;
+
+        public int ProjectTemplateCount
+        {
+            get => _projectTemplateCount;
+            private set
+            {
+                _projectTemplateCount = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int SolutionFolderCount
+        {
+            get => _solutionFolderCount;
+            private set
+            {
+                _solutionFolderCount = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string OutputPath
+        {
+            get => _outputPath;
+            set
+            {
+                if (_outputPath == value)
+                    return;
+
+                _outputPath = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(SolutionTemplateFullPath));
+
+                try
+                {
+                    if (!UseSolution)
+                        SetSolutionItems();
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e);
+                }
+            }
+        }
+
+        public string SolutionFile
+        {
+            get => _solutionFile;
+            set
+            {
+                _solutionFile = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string SolutionTemplateFullPath =>
+            OutputPath.GetTargetTemplatePath(SolutionTemplate?.TemplateName);
+
+        private bool IsFileSolution => !string.IsNullOrWhiteSpace(SolutionFile)
+                                       && Path.GetExtension(SolutionFile).Equals(".sln",
+                                           StringComparison.InvariantCultureIgnoreCase);
+
+        public ProjectTemplateModel SolutionTemplate
+        {
+            get => _solutionTemplate;
+            private set
+            {
+                _solutionTemplate = value;
+                RaisePropertyChanged();
+
+                RaisePropertyChanged(nameof(SolutionTemplateFullPath));
+            }
+        }
+
+        public ObservableCollection<ProjectTemplateModel> ProjectItems { get; } =
+            new ObservableCollection<ProjectTemplateModel>();
+
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set
+            {
+                _isBusy = value;
+                OnUpdateButtonsCanExecute();
+            }
+        }
+
+        public bool IsWindowOpen
+        {
+            get => _isWindowOpen;
+            set => Set(ref _isWindowOpen, value);
+        }
+
+        public string CurrentVSTemplateFolder
+        {
+            get => _currentVsTemplateFolder;
+            private set
+            {
+                _currentVsTemplateFolder = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool AutoImportToVS
+        {
+            get => _autoImportToVS;
+            set
+            {
+                _autoImportToVS = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool AutoOpenTemplate
+        {
+            get => _autoOpenTemplate;
+            set
+            {
+                _autoOpenTemplate = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool UseSolution
+        {
+            get => _useSolution;
+            set
+            {
+                _useSolution = value;
+                RaisePropertyChanged();
+
+                if (IsInDesignMode)
+                    return;
+
+                SetSolutionItems();
+            }
+        }
+
+        #endregion
+
         private void NotifyCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e)
         {
             SetProjectCounts();
@@ -81,12 +260,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
             IsDarkMode = Settings.Default.IsDarkMode;
 
-            _destinationFolder = Settings.Default.OutputPath;
+            _outputPath = Settings.Default.OutputPath;
 
-            if (string.IsNullOrWhiteSpace(_destinationFolder))
+            if (string.IsNullOrWhiteSpace(_outputPath))
             {
-                _destinationFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-                                     @"\Multi-Template Generator\Output";
+                _outputPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+                              @"\Multi-Template Generator\Output";
             }
 
             SolutionTemplate = new ProjectTemplateModel(false, null, SolutionPropertyChanged)
@@ -96,21 +275,25 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
             AppSettings.SolutionTemplateSettings.CopyTemplateProperties(SolutionTemplate);
 
-            var platformTags = SolutionTemplate.PlatformTags.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+            var platformTags = SolutionTemplate.PlatformTags.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim()).ToList();
             if (platformTags.Count == 0)
             {
                 platformTags = new List<string> { ProjectTemplateModel.DefaultPlatformTags[6] };
             }
+
             foreach (var platformTag in SolutionTemplate.PlatformTagsList)
             {
                 platformTag.IsChecked = platformTags.Contains(platformTag.Text);
             }
 
-            var projectTypeTags = SolutionTemplate.ProjectTypeTags.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+            var projectTypeTags = SolutionTemplate.ProjectTypeTags
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
             if (projectTypeTags.Count == 0)
             {
                 projectTypeTags = new List<string> { ProjectTemplateModel.DefaultProjectTypeTags[2] };
             }
+
             foreach (var projectTypeTag in SolutionTemplate.ProjectTypeTagsList)
             {
                 projectTypeTag.IsChecked = projectTypeTags.Contains(projectTypeTag.Text);
@@ -120,9 +303,19 @@ namespace MultiTemplateGenerator.UI.ViewModels
             AutoImportToVS = Settings.Default.AutoImportToVS;
         }
 
-        public string VSTemplateFolder { get; private set; }
+        public void SaveSettings()
+        {
+            Settings.Default.OpenGeneratedTemplate = AutoOpenTemplate;
+            Settings.Default.AutoImportToVS = AutoImportToVS;
+            Settings.Default.OutputPath = OutputPath;
+            Settings.Default.IsDarkMode = IsDarkMode;
 
-        public bool IsTagsSupported => _generatorService.IsTagsSupported;
+            SolutionTemplate.TrimProperties();
+            SolutionTemplate.CopyTemplateProperties(AppSettings.SolutionTemplateSettings);
+            AppSettings.SaveSettings();
+
+            Settings.Default.Save();
+        }
 
         public void SolutionPropertyChanged(ProjectTemplateModel template, string propertyName)
         {
@@ -144,21 +337,15 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }
 
-        public void SaveSettings()
+        private void ToggleDarkLightTheme(bool isDark)
         {
-            Settings.Default.OpenGeneratedTemplate = AutoOpenTemplate;
-            Settings.Default.AutoImportToVS = AutoImportToVS;
-            Settings.Default.OutputPath = DestinationFolder;
-            Settings.Default.IsDarkMode = IsDarkMode;
+            ITheme theme = _paletteHelper.GetTheme();
+            IBaseTheme baseTheme = isDark ? new MaterialDesignDarkTheme() : (IBaseTheme)new MaterialDesignLightTheme();
+            theme.SetBaseTheme(baseTheme);
+            _paletteHelper.SetTheme(theme);
 
-            SolutionTemplate.TrimProperties();
-            SolutionTemplate.CopyTemplateProperties(AppSettings.SolutionTemplateSettings);
-            AppSettings.SaveSettings();
-
-            Settings.Default.Save();
+            BaseTheme = baseTheme;
         }
-
-        public int GeneratedCount { get; private set; }
 
         public RelayCommand BrowseSolution => _browseSolution ??= new RelayCommand(() =>
         {
@@ -174,143 +361,18 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }, () => !IsBusy);
 
-        public bool IsDarkMode
-        {
-            get => _isDarkMode;
-            set
-            {
-                _isDarkMode = value;
-                ToggleDarkLightTheme(_isDarkMode);
-                RaisePropertyChanged();
-            }
-        }
-
-        public IBaseTheme BaseTheme
-        {
-            get => _baseTheme;
-            set { _baseTheme = value; RaisePropertyChanged(); }
-        }
-
-        private void ToggleDarkLightTheme(bool isDark)
-        {
-            ITheme theme = _paletteHelper.GetTheme();
-            IBaseTheme baseTheme = isDark ? new MaterialDesignDarkTheme() : (IBaseTheme)new MaterialDesignLightTheme();
-            theme.SetBaseTheme(baseTheme);
-            _paletteHelper.SetTheme(theme);
-
-            BaseTheme = baseTheme;
-        }
-
-        public string SolutionFile
-        {
-            get => _solutionFile;
-            set { _solutionFile = value; RaisePropertyChanged(); }
-        }
-
-        public string SolutionTemplateFullPath =>
-            DestinationFolder.GetTargetTemplatePath(SolutionTemplate?.TemplateName);
-
-        private bool IsFileSolution => !string.IsNullOrWhiteSpace(SolutionFile) && Path.GetExtension(SolutionFile).Equals(".sln", StringComparison.InvariantCultureIgnoreCase);
-
-        public ProjectTemplateModel SolutionTemplate
-        {
-            get => _solutionTemplate;
-            private set
-            {
-                _solutionTemplate = value;
-                RaisePropertyChanged();
-
-                RaisePropertyChanged(nameof(SolutionTemplateFullPath));
-            }
-        }
-
-        public ObservableCollection<ProjectTemplateModel> ProjectItems { get; } = new ObservableCollection<ProjectTemplateModel>();
-
-        public bool IsBusy
-        {
-            get => _isBusy;
-            set
-            {
-                _isBusy = value;
-                OnUpdateButtonsCanExecute();
-            }
-        }
-
-        public bool IsWindowOpen
-        {
-            get => _isWindowOpen;
-            set => Set(ref _isWindowOpen, value);
-        }
-
-        public string CurrentVSTemplateFolder
-        {
-            get => _currentVsTemplateFolder;
-            private set { _currentVsTemplateFolder = value; RaisePropertyChanged(); }
-        }
-
-
-
-        public bool AutoImportToVS
-        {
-            get => _autoImportToVS;
-            set { _autoImportToVS = value; RaisePropertyChanged(); }
-        }
-
-        public bool AutoOpenTemplate
-        {
-            get => _autoOpenTemplate;
-            set { _autoOpenTemplate = value; RaisePropertyChanged(); }
-        }
-
-        public string DestinationFolder
-        {
-            get => _destinationFolder;
-            set
-            {
-                if (_destinationFolder == value)
-                    return;
-
-                _destinationFolder = value;
-                RaisePropertyChanged();
-
-                try
-                {
-                    if (!UseSolution)
-                        SetSolutionItems();
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine(e);
-                }
-            }
-        }
-
-        public bool UseSolution
-        {
-            get => _useSolution;
-            set
-            {
-                _useSolution = value;
-                RaisePropertyChanged();
-
-                if (IsInDesignMode)
-                    return;
-
-                SetSolutionItems();
-            }
-        }
-
         public RelayCommand BrowseDestinationFolder => _browseDestinationFolder ??= new RelayCommand(() =>
         {
             if (IsInDesignMode)
                 return;
 
-            var folder = BrowseForLocation(DestinationFolder);
+            var folder = BrowseForLocation(OutputPath);
             if (folder != null)
-                DestinationFolder = folder;
+                OutputPath = folder;
         }, () => !IsBusy);
 
-        public RelayCommand GenerateTemplatesCommand => _generateTemplatesCommand ??= new RelayCommand(async () => await GenerateTemplateAsync(), () => !IsBusy);
+        public RelayCommand GenerateTemplatesCommand => _generateTemplatesCommand ??=
+            new RelayCommand(async () => await GenerateTemplateAsync(), () => !IsBusy);
 
         public RelayCommand<object> CloseWindowCommand => _closeWindowCommand ??= new RelayCommand<object>(window =>
         {
@@ -334,72 +396,19 @@ namespace MultiTemplateGenerator.UI.ViewModels
         }, () => IsBusy);
 
         public RelayCommand<ProjectTemplateModel> OpenProjectDetailsCommand => _openProjectDetailsCommand
-            ??= new RelayCommand<ProjectTemplateModel>(async (model) => await OpenProjectDetails(model), (model) => !IsBusy && !IsWindowOpen && model?.IsProject == true);
+            ??= new RelayCommand<ProjectTemplateModel>(async (model) => await OpenProjectDetails(model),
+                (model) => !IsBusy && !IsWindowOpen && model?.IsProject == true);
 
-        public RelayCommand RefreshViewCommand => _refreshViewCommand ??= new RelayCommand(SetSolutionItems, () => !IsBusy && !IsWindowOpen);
+        public RelayCommand RefreshViewCommand =>
+            _refreshViewCommand ??= new RelayCommand(SetSolutionItems, () => !IsBusy && !IsWindowOpen);
 
-        private RelayCommand<string> _deleteFolderContentCommand;
-        private int _projectTemplateCount;
-        private int _solutionFolderCount;
+        public RelayCommand<string> DeleteFolderContentCommand => _deleteFolderContentCommand ??=
+            new RelayCommand<string>(DeleteFolderContent,
+                (location) => !IsInDesignMode && !IsBusy && location.DirectoryExists());
 
-        public RelayCommand<string> DeleteFolderContentCommand => _deleteFolderContentCommand ??= new RelayCommand<string>(DeleteFolderContent,
-            (location) => !IsInDesignMode && !IsBusy && location.DirectoryExists());
-
-        protected void DeleteFolderContent(string location)
-        {
-            try
-            {
-                if (!location.DirectoryOrFileExists())
-                    return;
-
-                var di = new DirectoryInfo(location);
-                var totalDirs = di.GetDirectories("*.*", SearchOption.AllDirectories);
-                var totalFiles = di.GetFiles("*.*", SearchOption.AllDirectories);
-                if (totalDirs.Length == 0 && totalFiles.Length == 0)
-                    return;
-                var totalSize = totalFiles.Sum(x => x.Length);
-
-                if (!$"Are you sure you want to delete the entire folder contents?\n\n{location}:\nDirectories: {totalDirs.Length}\nFiles: {totalFiles.Length}\nSize: {totalSize.ToFileSize()}"
-                    .ShowQuestion("Delete folder content"))
-                    return;
-
-                location.DeleteDirectoryContents();
-
-                Logger.Information("Folder content deleted: {folder}", location);
-
-                if (!UseSolution)
-                {
-                    SetSolutionItems();
-                }
-
-                "Folder content deleted.".ShowWarning("Delete folder content");
-            }
-            catch (Exception e)
-            {
-                SetError(e, "Error in DeleteFolderContent");
-            }
-        }
-
-        public bool IsAppMenuOpen
-        {
-            get => _isAppMenuOpen;
-            set { _isAppMenuOpen = value; RaisePropertyChanged(); }
-        }
-
-        public RelayCommand<string> OpenDialogCommand => _openDialogCommand ??= new RelayCommand<string>(async (dialogName) => await OpenAppDialog(dialogName),
+        public RelayCommand<string> OpenDialogCommand => _openDialogCommand ??= new RelayCommand<string>(
+            async (dialogName) => await OpenAppDialog(dialogName),
             (dialogName) => !IsBusy && !IsWindowOpen && !string.IsNullOrEmpty(dialogName));
-
-        public int ProjectTemplateCount
-        {
-            get => _projectTemplateCount;
-            private set { _projectTemplateCount = value; RaisePropertyChanged(); }
-        }
-
-        public int SolutionFolderCount
-        {
-            get => _solutionFolderCount;
-            private set { _solutionFolderCount = value; RaisePropertyChanged(); }
-        }
 
         private async Task OpenAppDialog(string dialogName)
         {
@@ -436,7 +445,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             try
             {
                 var vm = new ProjectDetailsViewModel(model, Logger);
-                await DialogHost.Show(vm, "DialogRoot");
+                await DialogHost.Show(vm, ViewNames.DialogRoot);
             }
             catch (Exception exception)
             {
@@ -448,20 +457,56 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }
 
-        public void SetSolutionFile(string solutionFile)
+        private void DeleteFolderContent(string location)
+        {
+            try
+            {
+                if (!location.DirectoryOrFileExists())
+                    return;
+
+                var di = new DirectoryInfo(location);
+                var totalDirs = di.GetDirectories("*.*", SearchOption.AllDirectories);
+                var totalFiles = di.GetFiles("*.*", SearchOption.AllDirectories);
+                if (totalDirs.Length == 0 && totalFiles.Length == 0)
+                    return;
+                var totalSize = totalFiles.Sum(x => x.Length);
+
+                if (!
+                    $"Are you sure you want to delete the entire folder contents?\n\n{location}:\nDirectories: {totalDirs.Length}\nFiles: {totalFiles.Length}\nSize: {totalSize.ToFileSize()}"
+                        .ShowQuestion("Delete folder content"))
+                    return;
+
+                location.DeleteDirectoryContents();
+
+                Logger.Information("Folder content deleted: {folder}", location);
+
+                if (!UseSolution)
+                {
+                    SetSolutionItems();
+                }
+
+                "Folder content deleted.".ShowWarning("Delete folder content");
+            }
+            catch (Exception e)
+            {
+                SetError(e, "Error in DeleteFolderContent");
+            }
+        }
+
+        internal void SetSolutionFile(string solutionFile)
         {
             SolutionFile = solutionFile;
             UseSolution = SolutionFile.FileExists();
         }
 
-        internal TemplateOptions GetTemplateOptions()
+        private TemplateOptions GetTemplateOptions()
         {
             return new TemplateOptions
             {
                 SolutionFolder = Path.GetDirectoryName(SolutionFile),
                 SolutionTemplate = SolutionTemplate,
                 ProjectTemplates = ProjectItems.ConvertCheckedProjectTemplates(),
-                TargetFolder = DestinationFolder,
+                TargetFolder = OutputPath,
                 UseSolution = UseSolution,
                 AutoImportToVS = AutoImportToVS
             };
@@ -504,10 +549,9 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 }
                 else
                 {
-                    if (DestinationFolder.DirectoryExists())
+                    if (OutputPath.DirectoryExists())
                     {
-                        Settings.Default.OutputPath = DestinationFolder;
-                        projectItems = _generatorService.GetProjectTemplatesFromFolder(DestinationFolder).ToList();
+                        projectItems = _generatorService.GetProjectTemplatesFromFolder(OutputPath).ToList();
                     }
                 }
 
@@ -538,12 +582,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         #region Cancellation
 
-        protected bool CanCancelOperation()
+        private bool CanCancelOperation()
         {
             return CancelSource?.IsCancellationRequested == false;
         }
 
-        protected void CancelOperation()
+        private void CancelOperation()
         {
             InvokeHelper.Invoke(() =>
             {
@@ -561,20 +605,20 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
                 try
                 {
-                    //SetWarn(null, "Cancelling...");
+                    //SetWarn(null, "Canceling...");
                     //OnCancelling();
                     CancelSource.Cancel();
                 }
                 catch (Exception e)
                 {
-                    SetError($"Error cancelling: {e.Message}");
+                    SetError($"Error canceling: {e.Message}");
                 }
 
                 CloseWindowCommand.RaiseCanExecuteChanged();
             });
         }
 
-        protected void DisposeCancelSource()
+        private void DisposeCancelSource()
         {
             InvokeHelper.Invoke(() =>
             {
@@ -603,7 +647,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             });
         }
 
-        protected void NewCancelSource()
+        private void NewCancelSource()
         {
             InvokeHelper.Invoke(() =>
             {
@@ -624,23 +668,21 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 IsBusy = true;
                 NewCancelSource();
 
-                GeneratedCount = 0;
-
                 var errors = ValidateInputs();
 
                 if (errors.Count != 0)
                 {
                     var errorMessage = string.Join(Environment.NewLine, errors);
-                    errorMessage.ShowErrorMessageBox();
+                    await ShowError(errorMessage, "Validation");
                     return;
                 }
 
                 string existingContentMsg = string.Empty;
-                if (UseSolution)
+                if (UseSolution && OutputPath.DirectoryExists())
                 {
-                    var dirCount = Directory.EnumerateDirectories(DestinationFolder).Count();
+                    var dirCount = Directory.EnumerateDirectories(OutputPath).Count();
                     CancelSource.Token.ThrowIfCancellationRequested();
-                    var fileCount = Directory.EnumerateFiles(DestinationFolder).Count();
+                    var fileCount = Directory.EnumerateFiles(OutputPath).Count();
                     CancelSource.Token.ThrowIfCancellationRequested();
                     if (dirCount != 0 || fileCount != 0)
                     {
@@ -657,7 +699,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
                             existingContentMsg += $"{fileCount} files";
                         }
 
-                        existingContentMsg += $".{Environment.NewLine}Existing files will be overwritten!{Environment.NewLine}{Environment.NewLine}";
+                        existingContentMsg +=
+                            $".{Environment.NewLine}Existing files will be overwritten!{Environment.NewLine}{Environment.NewLine}";
                     }
                 }
 
@@ -666,12 +709,16 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 var solutionFolderCount = flattenedProjectTemplates.Count(x => !x.IsProject);
                 var projectCount = flattenedProjectTemplates.Count(x => x.IsProject);
 
-                var confirmContentMsg = $"{existingContentMsg}Are you sure you want to generate {projectCount} project templates";
+                var confirmContentMsg =
+                    $"{existingContentMsg}Are you sure you want to generate {projectCount} project templates";
                 if (solutionFolderCount != 0)
                     confirmContentMsg += $" and {solutionFolderCount} solution folders";
                 confirmContentMsg += "?";
 
-                if (!confirmContentMsg.ShowQuestion("Generate Templates"))
+                var msgBoxResult = await ShowMessageBox(confirmContentMsg,
+                    "Generate Templates", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
+
+                if (!msgBoxResult)
                 {
                     return;
                 }
@@ -681,7 +728,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 var multiTemplateFile = new FileInfo(SolutionTemplateFullPath);
                 if (multiTemplateFile.Exists && string.IsNullOrEmpty(existingContentMsg))
                 {
-                    if (!$"Are you sure you want to overwrite {multiTemplateFile.FullName}?".ShowQuestion(@"Overwrite Template"))
+                    var overWrite = await ShowMessageBox(
+                                        $"Are you sure you want to overwrite {multiTemplateFile.FullName}?",
+                                        "OverWrite Template", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) ==
+                                    MessageBoxResult.Yes;
+
+                    if (!overWrite)
                     {
                         return;
                     }
@@ -691,11 +743,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
                 ShowBusyWindow();
 
-                await Task.Run(() =>
-                {
-                    _generatorService.GenerateTemplate(options, CancelSource.Token);
-                    GeneratedCount = flattenedProjectTemplates.Count;
-                }, CancelSource.Token);
+                await Task.Run(() => { _generatorService.GenerateTemplate(options, CancelSource.Token); },
+                    CancelSource.Token);
 
                 DisposeCancelSource();
 
@@ -713,15 +762,17 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     }
                 }
 
-                Logger.Information($"Generated {projectCount} projects and {solutionFolderCount} successfully", projectCount, solutionFolderCount);
-                $"Generated {projectCount} projects successfully".ShowInfo(AppHelper.ProductName);
+                Logger.Information($"Generated {projectCount} projects and {solutionFolderCount} successfully",
+                    projectCount, solutionFolderCount);
+                await ShowMessageBox($"Generated {projectCount} projects successfully!");
             }
             catch (OperationCanceledException)
             {
                 CloseBusyWindow();
                 Logger.Information("Generating templates canceled!");
 
-                "Generating templates canceled!".ShowWarning(AppHelper.ProductName);
+                await ShowMessageBox("Generating templates canceled!", null, MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
             }
             catch (Exception ex)
             {
@@ -763,14 +814,14 @@ namespace MultiTemplateGenerator.UI.ViewModels
         {
             var errors = SolutionTemplate.ValidateInputs();
 
-            DestinationFolder = DestinationFolder.Trim();
-            if (string.IsNullOrWhiteSpace(DestinationFolder))
+            OutputPath = OutputPath.Trim();
+            if (string.IsNullOrWhiteSpace(OutputPath))
             {
                 errors.Add(@"Output folder is missing.");
             }
-            else if (!DestinationFolder.DirectoryExists())
+            else if (!OutputPath.DirectoryExists())
             {
-                DestinationFolder.CreateDirectory();
+                OutputPath.CreateDirectory();
             }
 
             if (errors.Any())
@@ -797,7 +848,5 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
             return errors;
         }
-
-
     }
 }

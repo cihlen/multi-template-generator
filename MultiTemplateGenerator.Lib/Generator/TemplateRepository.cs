@@ -34,7 +34,7 @@ namespace MultiTemplateGenerator.Lib.Generator
                 Trace.WriteLine(e);
             }
         }
-        public string VSTemplateVersion { get; set; } = "3.0.0";
+        public string VSTemplateVersion { get; set; } = "2.0.0";
 
         public Version RunningVSVersion { get; set; } = new Version(16, 8, 0);
 
@@ -93,7 +93,8 @@ namespace MultiTemplateGenerator.Lib.Generator
                 sw.WriteLine("  <TemplateContent>");
                 sw.WriteLine($"    <Project TargetFileName=\"{projectFile.Name}\" File=\"{projectFile.Name}\" ReplaceParameters=\"true\">");
 
-                var blackList = new List<string> { "bin", "obj", "TestResults", ".*", projectTemplateFile.Name, template.TemplateName + ".zip" };
+                var blackList = new List<string> { "bin", "obj", "TestResults", ".*",
+                    projectTemplateFile.Name, template.TemplateName + ".zip", "__TemplateIcon.*", "__PreviewImage.*" };
 
                 WriteFileSystemInfo(sw, projectFile.Directory.FullName, 6, blackList, ct);
 
@@ -126,7 +127,7 @@ namespace MultiTemplateGenerator.Lib.Generator
                 sw.WriteLine($"{padStart}</Folder>");
             }
 
-            foreach (var file in dirInfo.GetFiles())
+            foreach (var file in dirInfo.GetFilesExcept(blackList))
             {
                 sw.WriteLine($"{padStart}<ProjectItem ReplaceParameters=\"true\" TargetFileName=\"{file.Name}\">{file.Name}</ProjectItem>");
             }
@@ -207,7 +208,7 @@ namespace MultiTemplateGenerator.Lib.Generator
                 var projectName = template.TemplateName.GetProjectName(solutionDefaultName);
 
                 var templateFileName = $"{template.TemplateName.GetSafePathName()}\\{template.TemplateFileName}";
-                sw.WriteLine($"{padStart}<ProjectTemplateLink ProjectName=\"{projectName}\">");
+                sw.WriteLine($"{padStart}<ProjectTemplateLink ProjectName=\"{projectName}\" CopyParameters=\"true\">");
                 sw.WriteLine($"{padStart}  {templateFileName}");
                 sw.WriteLine($"{padStart}</ProjectTemplateLink>");
             }

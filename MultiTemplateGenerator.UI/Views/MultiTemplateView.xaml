@@ -15,6 +15,7 @@
     Width="700"
     d:DataContext="{d:DesignInstance Type=viewModels:GeneratorViewModel}"
     d:DesignHeight="650"
+    helpers:WindowSettings.Save="True"
     Background="{DynamicResource MaterialDesignPaper}"
     Closing="MainWindow_Closing"
     DataContext="{Binding MainVM, Source={StaticResource Locator}}"
@@ -26,7 +27,7 @@
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
-    WindowStartupLocation="CenterScreen"
+    WindowStartupLocation="Manual"
     mc:Ignorable="d">
     <Window.Resources>
         <viewModels:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
@@ -39,6 +40,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:AboutViewModel}">
             <views:AboutView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:MessageBoxViewModel}">
+            <views:MessageBoxDialog />
         </DataTemplate>
 
         <Style TargetType="StackPanel">
@@ -99,7 +103,7 @@
         <KeyBinding
             Key="O"
             Command="{Binding OpenLocationCommand, Mode=OneWay}"
-            CommandParameter="{Binding DestinationFolder, Mode=OneWay}"
+            CommandParameter="{Binding OutputPath, Mode=OneWay}"
             Modifiers="Control+Shift" />
 
     </Window.InputBindings>
@@ -225,8 +229,8 @@
                             <Label>
                                 <Hyperlink
                                     Command="{Binding OpenLocationCommand, Mode=OneWay}"
-                                    CommandParameter="{Binding DestinationFolder, Mode=OneWay}"
-                                    ToolTip="Open output folder in explorer">
+                                    CommandParameter="{Binding OutputPath, Mode=OneWay}"
+                                    ToolTip="Open output directory in explorer">
                                     <Run Text="Output Path:" />
                                 </Hyperlink>
                             </Label>
@@ -234,9 +238,10 @@
                                 Width="20"
                                 Height="20"
                                 Padding="0"
+                                HorizontalAlignment="Right"
                                 Command="{Binding DeleteFolderContentCommand}"
-                                CommandParameter="{Binding DestinationFolder}"
-                                ToolTip="Delete out folder content">
+                                CommandParameter="{Binding OutputPath}"
+                                ToolTip="Delete output directory content">
                                 <materialDesign:PackIcon Kind="TrashCanOutline" />
                             </Button>
                         </StackPanel>
@@ -247,7 +252,7 @@
                             materialDesign:HintAssist.Hint="Enter path to output directory"
                             Command="{Binding BrowseDestinationFolder}"
                             Style="{DynamicResource BrowseTextBox}"
-                            Text="{Binding DestinationFolder, UpdateSourceTrigger=LostFocus}" />
+                            Text="{Binding OutputPath, UpdateSourceTrigger=LostFocus}" />
 
                         <StackPanel
                             Grid.Row="1"

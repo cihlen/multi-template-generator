@@ -26,7 +26,6 @@
 
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
-
     <converters:ColorZoneDarkModeConverter x:Key="ColorZoneDarkModeConverter" />
 
     <converters:BoolConverter

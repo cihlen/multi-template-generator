@@ -16,15 +16,17 @@ namespace MultiTemplateGenerator.App
 
             string testSolutionName = null;
 
-            if (e.Args.Length == 1)
+            if (e.Args.Length > 0)
             {
                 testSolutionName = e.Args[0];
                 if (!testSolutionName.FileExists())
                     testSolutionName = null;
             }
 
-            MultiTemplateView projectSelectView = new MultiTemplateView(testSolutionName);
-            projectSelectView.ShowInTaskbar = true;
+            MultiTemplateView projectSelectView = new MultiTemplateView(testSolutionName)
+            {
+                ShowInTaskbar = true
+            };
             projectSelectView.ShowDialog();
         }
     }
