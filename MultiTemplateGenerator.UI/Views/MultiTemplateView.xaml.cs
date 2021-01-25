@@ -60,7 +60,7 @@ namespace MultiTemplateGenerator.UI.Views
             try
             {
                 var viewModel = ((ViewModelLocator)FindResource("Locator")).MainVM;
-                
+
                 viewModel.SetSolutionFile(solutionFilePath);
                 DataContext = viewModel;
             }
@@ -80,15 +80,7 @@ namespace MultiTemplateGenerator.UI.Views
                 if (viewModel == null)
                     return;
 
-                if (viewModel.IsBusy)
-                {
-                    if (!$"{AppHelper.ProductName} is busy, are you sure you want to exit?".ShowQuestion(AppHelper.ProductName + " exit"))
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-                }
-                viewModel.SaveSettings();
+                viewModel.AppClosing(e);
             }
             catch (Exception exception)
             {

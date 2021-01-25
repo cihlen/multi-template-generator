@@ -21,39 +21,85 @@ namespace MultiTemplateGenerator.UI.ViewModels
             Logger = logger;
         }
 
-        protected virtual void SetError(Exception exception, string message = null)
+        protected virtual async Task SetErrorAsync(Exception exception, string message = null)
         {
-            if (message == null)
-                message = exception.Message;
+            message ??= exception.Message;
 
             Logger.Error(exception, message);
-            ShowError(message).Wait();
+            await ShowErrorAsync(message);
+        }
+
+        protected virtual void SetError(Exception exception, string message = null)
+        {
+            message ??= exception.Message;
+
+            Logger.Error(exception, message);
+            ShowError(message);
         }
 
         protected virtual void SetError(string message)
         {
             Logger.Error(message);
-            message.ShowErrorMessageBox();
+            ShowError(message);
         }
 
-        protected async Task<MessageBoxResult> ShowMessageBox(string message, string title = null, MessageBoxButton buttons = MessageBoxButton.OK,
+        private bool _isMsgBoxOpen;
+
+        protected async Task<MessageBoxResult> ShowMessageBoxAsync(string message, string title = null, MessageBoxButton buttons = MessageBoxButton.OK,
             MessageBoxImage messageBoxImage = MessageBoxImage.Information)
         {
+            if (_isMsgBoxOpen)
+            {
+                DialogHost.Close(ViewNames.MessageBoxDialogRoot, MessageBoxResult.Cancel);
+            }
+
             var msgVm = new MessageBoxViewModel(message, title, buttons, messageBoxImage);
-            await DialogHost.Show(msgVm, ViewNames.DialogRoot);
+            _isMsgBoxOpen = true;
+            try
+            {
+                await DialogHost.Show(msgVm, ViewNames.MessageBoxDialogRoot);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, null, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                _isMsgBoxOpen = false;
+            }
             return msgVm.MessageBoxResult;
         }
 
-        protected async Task ShowError(string message, string title = null)
+        protected MessageBoxResult ShowMessageBox(string message, string title = null,
+            MessageBoxButton buttons = MessageBoxButton.OK,
+            MessageBoxImage messageBoxImage = MessageBoxImage.Information)
         {
-            await ShowMessageBox(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+            var task = ShowMessageBoxAsync(message, title, buttons, messageBoxImage);
+            return task.ConfigureAwait(false).GetAwaiter().GetResult();
         }
+
+        protected async Task ShowErrorAsync(string message, string title = null)
+        {
+            await ShowMessageBoxAsync(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        protected void ShowError(string message, string title = null)
+        {
+            message.ShowErrorMessageBox();
+            //ShowMessageBoxAsync(message, title, MessageBoxButton.OK, MessageBoxImage.Error).Wait();
+        }
+
+        protected bool ShowQuestion(string message, string title = null, MessageBoxImage messageBoxImage = MessageBoxImage.Question)
+        {
+            return message.ShowQuestion(title, messageBoxImage);
+        }
+
         #region Open/Execute
 
         private RelayCommand<string> _openLocationCommand;
         public RelayCommand<string> OpenLocationCommand => _openLocationCommand
-            ??= new RelayCommand<string>(OpenLocation, (location) => !IsInDesignMode /*&& location.DirectoryOrFileExists()*/);
-        protected void OpenLocation(string location)
+            ??= new RelayCommand<string>(async (location) => await OpenLocationAsync(location), (location) => !IsInDesignMode /*&& location.DirectoryOrFileExists()*/);
+        protected async Task OpenLocationAsync(string location)
         {
             try
             {
@@ -67,15 +113,16 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                SetError(e, $"Error in OpenLocation: {location}");
+                await SetErrorAsync(e, $"Error in OpenLocation: {location}");
             }
         }
 
         private RelayCommand<string> _executeFileCommand;
 
-        public RelayCommand<string> ExecuteFileCommand => _executeFileCommand ??= new RelayCommand<string>(ExecuteFile, (filePath) => !IsInDesignMode && filePath.FileExists());
+        public RelayCommand<string> ExecuteFileCommand => _executeFileCommand ??= new RelayCommand<string>(async (fileName) =>
+            await ExecuteFileAsync(fileName), (filePath) => !IsInDesignMode && filePath.FileExists());
 
-        protected void ExecuteFile(string fileName)
+        protected async Task ExecuteFileAsync(string fileName)
         {
             try
             {
@@ -88,15 +135,16 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                SetError(e, "Error in ExecuteFile");
+                await SetErrorAsync(e, "Error in ExecuteFile");
             }
         }
 
         private RelayCommand<string> _openInternetCommand;
 
-        public RelayCommand<string> OpenInternetCommand => _openInternetCommand ??= new RelayCommand<string>(OpenInternet);
+        public RelayCommand<string> OpenInternetCommand => _openInternetCommand ??=
+            new RelayCommand<string>(async (url) => await OpenInternet(url));
 
-        protected void OpenInternet(string url)
+        protected async Task OpenInternet(string url)
         {
             try
             {
@@ -104,7 +152,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                SetError(e);
+                await SetErrorAsync(e);
             }
         }
 

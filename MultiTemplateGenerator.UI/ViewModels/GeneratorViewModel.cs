@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -28,7 +29,6 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private bool _isBusy;
         private bool _autoImportToVS;
         private string _outputPath;
-        private bool _useSolution;
         private bool _autoOpenTemplate;
         private bool _isWindowOpen;
         private string _solutionFile;
@@ -109,6 +109,41 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }
 
+        public string TemplateTargetFolder
+        {
+            get
+            {
+                try
+                {
+                    return string.IsNullOrWhiteSpace(OutputPath) ||
+                           string.IsNullOrWhiteSpace(SolutionTemplate?.TemplateName)
+                        ? string.Empty
+                        : Path.Combine(OutputPath, SolutionTemplate.TemplateName.GetSafePathName());
+                }
+                catch (Exception e)
+                {
+                    ShowErrorAsync(e.Message).Wait();
+                    return null;
+                }
+            }
+        }
+
+        public string SolutionTemplateFullPath
+        {
+            get
+            {
+                try
+                {
+                    return TemplateTargetFolder.GetTargetTemplatePath(SolutionTemplate?.TemplateName);
+                }
+                catch (Exception e)
+                {
+                    SetError(e.Message);
+                    return null;
+                }
+            }
+        }
+
         public string OutputPath
         {
             get => _outputPath;
@@ -119,17 +154,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
                 _outputPath = value;
                 RaisePropertyChanged();
+                RaisePropertyChanged(nameof(TemplateTargetFolder));
                 RaisePropertyChanged(nameof(SolutionTemplateFullPath));
-
-                try
-                {
-                    if (!UseSolution)
-                        SetSolutionItems();
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine(e);
-                }
             }
         }
 
@@ -140,11 +166,10 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 _solutionFile = value;
                 RaisePropertyChanged();
+
+                SetSolutionItems();
             }
         }
-
-        public string SolutionTemplateFullPath =>
-            OutputPath.GetTargetTemplatePath(SolutionTemplate?.TemplateName);
 
         private bool IsFileSolution => !string.IsNullOrWhiteSpace(SolutionFile)
                                        && Path.GetExtension(SolutionFile).Equals(".sln",
@@ -211,21 +236,6 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }
 
-        public bool UseSolution
-        {
-            get => _useSolution;
-            set
-            {
-                _useSolution = value;
-                RaisePropertyChanged();
-
-                if (IsInDesignMode)
-                    return;
-
-                SetSolutionItems();
-            }
-        }
-
         #endregion
 
         private void NotifyCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e)
@@ -236,6 +246,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private void GetSettings()
         {
             VSTemplateFolder = FileExtensions.FindVSTemplateFolder();
+
+            OptionsVM.CopyPropertiesFromSolution = Settings.Default.CopyPropertiesFromSolution;
 
             _outputPath = Settings.Default.OutputPath;
 
@@ -290,6 +302,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             Settings.Default.OutputPath = OutputPath;
             Settings.Default.IsDarkMode = OptionsVM.IsDarkMode;
             Settings.Default.AutoExpand = OptionsVM.AutoExpand;
+            Settings.Default.CopyPropertiesFromSolution = OptionsVM.CopyPropertiesFromSolution;
 
             SolutionTemplate.TrimProperties();
             SolutionTemplate.CopyTemplateProperties(AppSettings.SolutionTemplateSettings);
@@ -304,6 +317,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 if (propertyName.Equals(nameof(template.TemplateName)))
                 {
+                    RaisePropertyChanged(nameof(TemplateTargetFolder));
                     RaisePropertyChanged(nameof(SolutionTemplateFullPath));
                 }
                 else if (propertyName.Equals(nameof(template.LanguageTag)))
@@ -374,7 +388,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             _refreshViewCommand ??= new RelayCommand(SetSolutionItems, () => !IsBusy && !IsWindowOpen);
 
         public RelayCommand<string> DeleteFolderContentCommand => _deleteFolderContentCommand ??=
-            new RelayCommand<string>(DeleteFolderContent,
+            new RelayCommand<string>(async (location) => await DeleteFolderContent(location),
                 (location) => !IsInDesignMode && !IsBusy && location.DirectoryExists());
 
         public RelayCommand<string> OpenDialogCommand => _openDialogCommand ??= new RelayCommand<string>(
@@ -407,7 +421,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
             catch (Exception exception)
             {
-                SetError(exception, $"Error in {nameof(OpenAppDialog)}");
+                await SetErrorAsync(exception, $"Error in {nameof(OpenAppDialog)}");
             }
             finally
             {
@@ -425,7 +439,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
             catch (Exception exception)
             {
-                SetError(exception, $"Error in {nameof(OpenProjectDetails)}");
+                await SetErrorAsync(exception, $"Error in {nameof(OpenProjectDetails)}");
             }
             finally
             {
@@ -433,7 +447,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }
 
-        private void DeleteFolderContent(string location)
+        private async Task DeleteFolderContent(string location)
         {
             try
             {
@@ -446,33 +460,30 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 if (totalDirs.Length == 0 && totalFiles.Length == 0)
                     return;
                 var totalSize = totalFiles.Sum(x => x.Length);
+                var dialogMessage =
+                    $"Are you sure you want to delete the entire folder contents?\n\n{location}:\nDirectories: {totalDirs.Length}\nFiles: {totalFiles.Length}\nSize: {totalSize.ToFileSize()}";
+                var msgBoxResult = await ShowMessageBoxAsync(dialogMessage, "Delete folder content", MessageBoxButton.YesNo,
+                    MessageBoxImage.Exclamation);
 
-                if (!
-                    $"Are you sure you want to delete the entire folder contents?\n\n{location}:\nDirectories: {totalDirs.Length}\nFiles: {totalFiles.Length}\nSize: {totalSize.ToFileSize()}"
-                        .ShowQuestion("Delete folder content"))
+                if (msgBoxResult != MessageBoxResult.Yes)
+                    //if (!dialogMessage.ShowQuestion("Delete folder content"))
                     return;
 
                 location.DeleteDirectoryContents();
 
                 Logger.Information("Folder content deleted: {folder}", location);
 
-                if (!UseSolution)
-                {
-                    SetSolutionItems();
-                }
-
-                "Folder content deleted.".ShowWarning("Delete folder content");
+                await ShowMessageBoxAsync("Folder content deleted.", "Delete folder content");
             }
             catch (Exception e)
             {
-                SetError(e, "Error in DeleteFolderContent");
+                await SetErrorAsync(e, "Error in DeleteFolderContent");
             }
         }
 
         internal void SetSolutionFile(string solutionFile)
         {
             SolutionFile = solutionFile;
-            UseSolution = SolutionFile.FileExists();
         }
 
         private TemplateOptions GetTemplateOptions()
@@ -482,8 +493,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 SolutionFolder = Path.GetDirectoryName(SolutionFile),
                 SolutionTemplate = SolutionTemplate,
                 ProjectTemplates = ProjectItems.ConvertCheckedProjectTemplates(),
-                TargetFolder = OutputPath,
-                UseSolution = UseSolution,
+                TargetFolder = TemplateTargetFolder,
                 AutoImportToVS = AutoImportToVS
             };
         }
@@ -495,7 +505,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 ProjectItems.Clear();
                 List<IProjectTemplate> projectItems = new List<IProjectTemplate>(0);
 
-                string defaultTemplateName = string.IsNullOrWhiteSpace(SolutionFile)
+                var defaultTemplateName = string.IsNullOrWhiteSpace(SolutionFile)
                     ? null
                     : Path.GetFileNameWithoutExtension(SolutionFile)
                         .Replace('.', ' ');
@@ -504,31 +514,21 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     SolutionTemplate.TemplateName = defaultTemplateName;
                 SolutionTemplate.DefaultName = defaultTemplateName ?? SolutionTemplate.TemplateName;
 
-                if (UseSolution)
+                if (!SolutionFile.FileExists())
                 {
-                    if (!SolutionFile.FileExists())
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    if (IsFileSolution)
-                    {
-                        projectItems = _generatorService.GetProjectTemplates(SolutionFile, SolutionTemplate);
-                    }
-                    else
-                    {
-                        var solutionTemplate = _generatorService.ReadSolutionTemplate(SolutionFile);
-                        projectItems.AddRange(solutionTemplate.Children);
-                        solutionTemplate.Children.Clear();
-                        SolutionTemplate = solutionTemplate.ToModel(null);
-                    }
+                if (IsFileSolution)
+                {
+                    projectItems = _generatorService.GetProjectTemplates(SolutionFile, SolutionTemplate, OptionsVM.CopyPropertiesFromSolution);
                 }
                 else
                 {
-                    if (OutputPath.DirectoryExists())
-                    {
-                        projectItems = _generatorService.GetProjectTemplatesFromFolder(OutputPath).ToList();
-                    }
+                    var solutionTemplate = _generatorService.ReadSolutionTemplate(SolutionFile);
+                    projectItems.AddRange(solutionTemplate.Children);
+                    solutionTemplate.Children.Clear();
+                    SolutionTemplate = solutionTemplate.ToModel(null);
                 }
 
                 projectItems = projectItems.OrderBy(x => x.IsProject).ToList();
@@ -649,20 +649,20 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 if (errors.Count != 0)
                 {
                     var errorMessage = string.Join(Environment.NewLine, errors);
-                    await ShowError(errorMessage, "Validation");
+                    await ShowErrorAsync(errorMessage, "Validation");
                     return;
                 }
 
                 string existingContentMsg = string.Empty;
-                if (UseSolution && OutputPath.DirectoryExists())
+                if (TemplateTargetFolder.DirectoryExists())
                 {
-                    var dirCount = Directory.EnumerateDirectories(OutputPath).Count();
+                    var dirCount = Directory.EnumerateDirectories(TemplateTargetFolder).Count();
                     CancelSource.Token.ThrowIfCancellationRequested();
-                    var fileCount = Directory.EnumerateFiles(OutputPath).Count();
+                    var fileCount = Directory.EnumerateFiles(TemplateTargetFolder).Count();
                     CancelSource.Token.ThrowIfCancellationRequested();
                     if (dirCount != 0 || fileCount != 0)
                     {
-                        existingContentMsg = "WARNING: Output folder already contains ";
+                        existingContentMsg = "WARNING: Target folder already contains ";
                         if (dirCount != 0)
                         {
                             existingContentMsg += $"{dirCount} directories";
@@ -691,7 +691,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     confirmContentMsg += $" and {solutionFolderCount} solution folders";
                 confirmContentMsg += "?";
 
-                var msgBoxResult = await ShowMessageBox(confirmContentMsg,
+                var msgBoxResult = await ShowMessageBoxAsync(confirmContentMsg,
                     "Generate Templates", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
 
                 if (!msgBoxResult)
@@ -702,18 +702,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 SaveSettings();
 
                 var multiTemplateFile = new FileInfo(SolutionTemplateFullPath);
-                if (multiTemplateFile.Exists && string.IsNullOrEmpty(existingContentMsg))
+                if (multiTemplateFile.Exists)
                 {
-                    var overWrite = await ShowMessageBox(
-                                        $"Are you sure you want to overwrite {multiTemplateFile.FullName}?",
-                                        "OverWrite Template", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) ==
-                                    MessageBoxResult.Yes;
-
-                    if (!overWrite)
-                    {
-                        return;
-                    }
-
                     multiTemplateFile.Delete();
                 }
 
@@ -722,9 +712,11 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 await Task.Run(() => { _generatorService.GenerateTemplate(options, CancelSource.Token); },
                     CancelSource.Token);
 
-                DisposeCancelSource();
+                CancelSource.Token.ThrowIfCancellationRequested();
 
                 CloseBusyWindow();
+
+                DisposeCancelSource();
 
                 if (AutoOpenTemplate)
                 {
@@ -734,32 +726,33 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     }
                     catch (Exception e)
                     {
-                        SetError(e, $"Error opening template: {e.Message}");
+                        await SetErrorAsync(e, $"Error opening template: {e.Message}");
                     }
                 }
 
                 Logger.Information($"Generated {projectCount} projects and {solutionFolderCount} successfully",
                     projectCount, solutionFolderCount);
-                await ShowMessageBox($"Generated {projectCount} projects successfully!");
+                await ShowMessageBoxAsync($"Generated {projectCount} projects successfully!");
             }
             catch (OperationCanceledException)
             {
                 CloseBusyWindow();
                 Logger.Information("Generating templates canceled!");
 
-                await ShowMessageBox("Generating templates canceled!", null, MessageBoxButton.OK,
+                await ShowMessageBoxAsync("Generating templates canceled!", null, MessageBoxButton.OK,
                     MessageBoxImage.Exclamation);
             }
             catch (Exception ex)
             {
                 CloseBusyWindow();
-                SetError(ex, $"Error generating templates: {ex.Message}");
+                await SetErrorAsync(ex, $"Error generating templates: {ex.Message}");
             }
             finally
             {
                 DisposeCancelSource();
                 IsBusy = false;
                 CloseBusyWindow();
+                RaisePropertyChanged(nameof(TemplateTargetFolder));
                 RaisePropertyChanged(nameof(SolutionTemplateFullPath));
                 SetProjectCounts();
             }
@@ -778,7 +771,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             IsWindowOpen = false;
             try
             {
-                DialogHost.Close("DialogRoot");
+                DialogHost.Close(ViewNames.DialogRoot);
             }
             catch (Exception e)
             {
@@ -794,10 +787,6 @@ namespace MultiTemplateGenerator.UI.ViewModels
             if (string.IsNullOrWhiteSpace(OutputPath))
             {
                 errors.Add(@"Output folder is missing.");
-            }
-            else if (!OutputPath.DirectoryExists())
-            {
-                OutputPath.CreateDirectory();
             }
 
             if (errors.Any())
@@ -823,6 +812,20 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
 
             return errors;
+        }
+
+        public void AppClosing(CancelEventArgs e)
+        {
+            if (IsBusy)
+            {
+                if (!ShowQuestion($"{AppHelper.ProductName} is busy, are you sure you want to exit?", AppHelper.ProductName + " exit"))
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            SaveSettings();
         }
     }
 }

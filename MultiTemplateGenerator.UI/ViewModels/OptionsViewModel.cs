@@ -13,6 +13,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private IBaseTheme _baseTheme;
         private bool _isDarkMode;
         private RelayCommand _closeCommand;
+        private bool _autoExpand;
+        private bool _copyPropertiesFromSolution;
 
         public OptionsViewModel(ILogger logger)
         {
@@ -21,7 +23,17 @@ namespace MultiTemplateGenerator.UI.ViewModels
             IsDarkMode = false;
         }
 
-        public bool AutoExpand { get; set; } = true;
+        public bool AutoExpand
+        {
+            get => _autoExpand;
+            set { _autoExpand = value; RaisePropertyChanged(); }
+        }
+
+        public bool CopyPropertiesFromSolution
+        {
+            get => _copyPropertiesFromSolution;
+            set { _copyPropertiesFromSolution = value; RaisePropertyChanged(); }
+        }
 
         public bool IsDarkMode
         {

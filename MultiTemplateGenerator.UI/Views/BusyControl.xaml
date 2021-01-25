@@ -29,7 +29,7 @@
                 Width="64"
                 Height="64"
                 Margin="10"
-                Foreground="{Binding GeneratorVM.IsDarkMode, Converter={StaticResource ForegroundConverter}}"
+                Foreground="{Binding GeneratorVM.OptionsVM.IsDarkMode, Converter={StaticResource ForegroundConverter}}"
                 Icon="Spinner"
                 Spin="True"
                 SpinDuration="4" />

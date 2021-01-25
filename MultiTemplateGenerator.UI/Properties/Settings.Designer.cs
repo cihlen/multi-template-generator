@@ -110,5 +110,17 @@ namespace MultiTemplateGenerator.UI.Properties {
                 this["AutoExpand"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CopyPropertiesFromSolution {
+            get {
+                return ((bool)(this["CopyPropertiesFromSolution"]));
+            }
+            set {
+                this["CopyPropertiesFromSolution"] = value;
+            }
+        }
     }
 }

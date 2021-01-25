@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:MultiTemplateGenerator.UI.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewModels:OptionsViewModel}"
+    d:DesignWidth="400"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{DynamicResource MaterialDesignFont}"
     TextElement.FontSize="13"
@@ -28,23 +29,30 @@
                         <Setter Property="Orientation" Value="Horizontal" />
                         <Setter Property="Margin" Value="5" />
                     </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="5,0,0,0" />
+                    </Style>
                 </StackPanel.Resources>
                 <StackPanel>
-                    <ToggleButton IsChecked="{Binding IsDarkMode}" />
-                    <TextBlock Margin="10,0,0,0" Text="Dark Mode" />
+                    <ToggleButton IsChecked="{Binding CopyPropertiesFromSolution}" />
+                    <TextBlock Text="Copy values from solution" />
                 </StackPanel>
-
                 <StackPanel>
                     <ToggleButton IsChecked="{Binding AutoExpand}" />
-                    <TextBlock Margin="10,0,0,0" Text="Auto-expand items" />
+                    <TextBlock Text="Auto-expand items" />
+                </StackPanel>
+                <StackPanel>
+                    <ToggleButton IsChecked="{Binding IsDarkMode}" />
+                    <TextBlock Text="Dark Mode" />
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal"
-                        Grid.Row="1"
-                        Margin="5,10,5,5"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom">
+            <StackPanel
+                Grid.Row="1"
+                Margin="5,10,5,5"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Orientation="Horizontal">
                 <Button
                     Width="90"
                     Command="{Binding CloseCommand}"

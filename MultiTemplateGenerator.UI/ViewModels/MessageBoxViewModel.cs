@@ -73,7 +73,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
         public RelayCommand<MessageBoxResult> ButtonCommand => _buttonCommand ??= new RelayCommand<MessageBoxResult>((button) =>
         {
             MessageBoxResult = button;
-            DialogHost.Close(ViewNames.DialogRoot);
+            DialogHost.Close(ViewNames.MessageBoxDialogRoot);
         }, (button) => button != MessageBoxResult.None);
 
 

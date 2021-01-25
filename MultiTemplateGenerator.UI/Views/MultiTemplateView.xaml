@@ -104,23 +104,29 @@
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshViewCommand}" />
         <KeyBinding
-        Key="O"
-        Command="{Binding OpenDialogCommand, Mode=OneWay}"
-        CommandParameter="{x:Static helpers:ViewNames.Options}"
-        Modifiers="Control" />
+            Key="O"
+            Command="{Binding OpenDialogCommand, Mode=OneWay}"
+            CommandParameter="{x:Static helpers:ViewNames.Options}"
+            Modifiers="Control" />
         <KeyBinding
             Key="O"
             Command="{Binding OpenLocationCommand, Mode=OneWay}"
             CommandParameter="{Binding OutputPath, Mode=OneWay}"
             Modifiers="Control+Shift" />
-
     </Window.InputBindings>
+
     <Grid>
+        <materialDesign:DialogHost
+            x:Name="MessageBoxDialogHost"
+            CloseOnClickAway="False"
+            DialogTheme="{Binding OptionsVM.BaseTheme, Mode=OneWay}"
+            Identifier="{x:Static helpers:ViewNames.MessageBoxDialogRoot}" />
+
         <materialDesign:DialogHost
             x:Name="MainDialogHost"
             CloseOnClickAway="False"
             DialogTheme="{Binding OptionsVM.BaseTheme, Mode=OneWay}"
-            Identifier="DialogRoot">
+            Identifier="{x:Static helpers:ViewNames.DialogRoot}">
 
             <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding Path=IsAppMenuOpen}">
                 <materialDesign:DrawerHost.LeftDrawerContent>
@@ -274,19 +280,12 @@
                             Grid.ColumnSpan="5"
                             Margin="0,5,0,0"
                             Orientation="Vertical">
-                            <RadioButton
-                                Margin="5"
-                                Content="Use project templates from output path"
-                                IsChecked="{Binding UseSolution, Converter={StaticResource InvertBoolConverter}}" />
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <RadioButton
-                                    Margin="5"
-                                    Content="Use projects from solution/vstemplate:"
-                                    IsChecked="{Binding UseSolution}" />
+                                <Label Content="Solution/vstemplate source:" />
                                 <controls:SearchTextBox
                                     Grid.Column="1"
                                     Margin="5,0,0,0"

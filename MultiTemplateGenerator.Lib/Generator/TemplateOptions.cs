@@ -11,12 +11,11 @@ namespace MultiTemplateGenerator.Lib.Generator
         public string SolutionFolder { get; set; }
         public string TargetFolder { get; set; }
         public string TargetTemplatePath => !string.IsNullOrWhiteSpace(TargetFolder) ? Path.Combine(TargetFolder, $"{SolutionTemplate.TemplateFileName}") : string.Empty;
-        public bool UseSolution { get; set; }
         public bool AutoImportToVS { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(TargetTemplatePath)}: {TargetTemplatePath}\r\n{nameof(TargetFolder)}: {TargetFolder}\r\n{nameof(UseSolution)}: {UseSolution}\r\n{nameof(AutoImportToVS)}: {AutoImportToVS}";
+            return $"{nameof(TargetTemplatePath)}: {TargetTemplatePath}\r\n{nameof(TargetFolder)}: {TargetFolder}\r\n{nameof(AutoImportToVS)}: {AutoImportToVS}";
         }
     }
 }

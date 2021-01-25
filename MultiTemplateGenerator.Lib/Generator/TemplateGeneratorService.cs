@@ -12,7 +12,7 @@ namespace MultiTemplateGenerator.Lib.Generator
     public interface ITemplateGeneratorService
     {
         IEnumerable<IProjectTemplate> GetProjectTemplatesFromFolder(string destFolder);
-        List<IProjectTemplate> GetProjectTemplates(string solutionFile, IProjectTemplate solutionTemplate);
+        List<IProjectTemplate> GetProjectTemplates(string solutionFile, IProjectTemplate solutionTemplate, bool copyFromParent);
         IProjectTemplate ReadSolutionTemplate(string solutionTemplateFile);
         void GenerateTemplate(TemplateOptions generateOptions, CancellationToken cancellationToken);
         bool IsTagsSupported { get; }
@@ -37,13 +37,13 @@ namespace MultiTemplateGenerator.Lib.Generator
             return solution.GetSortedHierarchy();
         }
 
-        private IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent)
+        private IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent, bool copyFromParent)
         {
             _logger.Debug($"{nameof(ReadProjectTemplate)} solutionFolder: {solutionFolder}");
-            return _templateGenerator.ReadProjectTemplate(solutionFolder, item, parent);
+            return _templateGenerator.ReadProjectTemplate(solutionFolder, item, parent, copyFromParent);
         }
 
-        public List<IProjectTemplate> GetProjectTemplates(string solutionFile, IProjectTemplate solutionTemplate)
+        public List<IProjectTemplate> GetProjectTemplates(string solutionFile, IProjectTemplate solutionTemplate, bool copyFromParent)
         {
             _logger.Debug($"{nameof(GetProjectTemplates)} started");
             var solutionFileItems = GetSolutionFileItems(solutionFile);
@@ -52,7 +52,7 @@ namespace MultiTemplateGenerator.Lib.Generator
             foreach (var solutionItem in solutionFileItems)
             {
                 projectItems.Add(
-                    ReadProjectTemplate(Path.GetDirectoryName(solutionFile), solutionItem, solutionTemplate));
+                    ReadProjectTemplate(Path.GetDirectoryName(solutionFile), solutionItem, solutionTemplate, copyFromParent));
             }
 
             _logger.Debug($"{nameof(GetProjectTemplates)}: {projectItems.Count} project templates found");
@@ -73,13 +73,12 @@ namespace MultiTemplateGenerator.Lib.Generator
             var solutionTemplate = options.SolutionTemplate;
             var destFolder = options.TargetFolder;
 
-
             //Delete any .zip or .vstemplate files
-            var destDirInfo = new DirectoryInfo(destFolder);
-            if (destDirInfo.Exists)
+            var targetDir = new DirectoryInfo(destFolder);
+            if (targetDir.Exists)
             {
-                var filesToDelete = destDirInfo.GetFiles("*.zip").ToList();
-                filesToDelete.AddRange(destDirInfo.GetFiles("*.vstemplate", SearchOption.AllDirectories).ToList());
+                var filesToDelete = targetDir.GetFiles("*.zip").ToList();
+                filesToDelete.AddRange(targetDir.GetFiles("*.vstemplate", SearchOption.AllDirectories).ToList());
                 foreach (var fileToDelete in filesToDelete)
                 {
                     ct.ThrowIfCancellationRequested();
@@ -88,7 +87,7 @@ namespace MultiTemplateGenerator.Lib.Generator
             }
             else
             {
-                destDirInfo.Create();
+                targetDir.Create();
             }
 
             var multiTemplateFile = new FileInfo(options.TargetTemplatePath);
@@ -104,15 +103,15 @@ namespace MultiTemplateGenerator.Lib.Generator
 
             var projectTemplatesList = projectTemplates.ToList();
 
-            if (options.UseSolution)
+            _logger.Debug($"Creating {projectTemplatesList.Count} project templates...");
+            //Create project templates
+            foreach (var projectTemplate in projectTemplatesList)
             {
-                _logger.Debug($"Creating {projectTemplatesList.Count} project templates...");
-                //Create project templates
-                foreach (var projectTemplate in projectTemplatesList)
-                {
-                    _templateGenerator.CreateProjectTemplate(projectTemplate, options.SolutionFolder, destFolder, true, ct);
-                }
+                ct.ThrowIfCancellationRequested();
+                _templateGenerator.CreateProjectTemplate(projectTemplate, options.SolutionFolder, destFolder, true, ct);
             }
+
+            ct.ThrowIfCancellationRequested();
 
             _logger.Debug($"Creating solution template...");
             _templateGenerator.CreateSolutionTemplate(multiTemplateFile.FullName, solutionTemplate, projectTemplatesList);
@@ -124,10 +123,12 @@ namespace MultiTemplateGenerator.Lib.Generator
             FastZip zip = new FastZip();
             var tempZipFile = Path.GetTempFileName();
 
+            ct.ThrowIfCancellationRequested();
             zip.CreateZip(tempZipFile, destFolder, true, null);
 
             File.Move(tempZipFile, zipFileName);
 
+            ct.ThrowIfCancellationRequested();
             if (options.AutoImportToVS)
             {
                 _logger.Debug($"Importing zip file to VS template folder...");

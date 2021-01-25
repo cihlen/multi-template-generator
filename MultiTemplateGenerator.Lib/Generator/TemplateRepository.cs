@@ -16,7 +16,7 @@ namespace MultiTemplateGenerator.Lib.Generator
         void CreateSolutionTemplate(string solutionTemplateFile, IProjectTemplate solutionTemplate, IEnumerable<IProjectTemplate> solutionItems);
         void CreateProjectTemplate(IProjectTemplate solutionItem, string solutionFolder, string destFolder, bool copyFiles, CancellationToken ct);
         IProjectTemplate ReadProjectTemplate(string templateFilePath);
-        IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent);
+        IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent, bool copyFromParent);
         IProjectTemplate ReadSolutionTemplate(string templateFileName);
         bool IsTagsSupported { get; }
     }
@@ -68,6 +68,8 @@ namespace MultiTemplateGenerator.Lib.Generator
 
         public void CreateProjectTemplate(IProjectTemplate template, string solutionFolder, string destFolder, bool copyFiles, CancellationToken ct)
         {
+            ct.ThrowIfCancellationRequested();
+
             if (template.IsProject)
             {
                 var projectTemplateFile = new FileInfo(template.GetTemplateFileName(destFolder));
@@ -96,6 +98,7 @@ namespace MultiTemplateGenerator.Lib.Generator
                 var blackList = new List<string> { "bin", "obj", "TestResults", ".*",
                     projectTemplateFile.Name, template.TemplateName + ".zip", "__TemplateIcon.*", "__PreviewImage.*" };
 
+                ct.ThrowIfCancellationRequested();
                 WriteFileSystemInfo(sw, projectFile.Directory.FullName, 6, blackList, ct);
 
                 if (copyFiles)
@@ -332,30 +335,29 @@ namespace MultiTemplateGenerator.Lib.Generator
         //    }
         //}
 
-        public IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent)
+        public IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent, bool copyFromParent)
         {
             var template = new ProjectTemplate(item.IsProject);
 
             template.TemplateName = item.Name;
-            template.Description = parent.Description;
             template.DefaultName = template.TemplateName;
-            template.IconImagePath = parent.IconImagePath;
-            template.PreviewImagePath = parent.PreviewImagePath;
-            template.SortOrder = parent.SortOrder;
-
-            template.MaxFrameworkVersion = parent.MaxFrameworkVersion;
-            template.RequiredFrameworkVersion = parent.RequiredFrameworkVersion;
-            template.FrameworkVersion = parent.FrameworkVersion;
-
-            //if (template.IsProject)
-            //{
-            //    template.ProjectItems = GetProjectEntries(solutionFolder.GetFullPath(item.ProjectFileName)).ToList();
-            //}
             template.ProjectFileName = item.ProjectFileName;
+
+            if (copyFromParent)
+            {
+                template.Description = parent.Description;
+                template.IconImagePath = parent.IconImagePath;
+                template.PreviewImagePath = parent.PreviewImagePath;
+                template.SortOrder = parent.SortOrder;
+
+                template.MaxFrameworkVersion = parent.MaxFrameworkVersion;
+                template.RequiredFrameworkVersion = parent.RequiredFrameworkVersion;
+                template.FrameworkVersion = parent.FrameworkVersion;
+            }
 
             foreach (var itemChild in item.Children)
             {
-                template.Children.Add(ReadProjectTemplate(solutionFolder, itemChild, template));
+                template.Children.Add(ReadProjectTemplate(solutionFolder, itemChild, template, copyFromParent));
             }
 
             return template;
