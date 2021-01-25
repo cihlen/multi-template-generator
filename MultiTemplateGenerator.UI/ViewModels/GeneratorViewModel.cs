@@ -434,8 +434,15 @@ namespace MultiTemplateGenerator.UI.ViewModels
             IsWindowOpen = true;
             try
             {
-                var vm = new ProjectDetailsViewModel(model, Logger);
-                await DialogHost.Show(vm, ViewNames.DialogRoot);
+                var vm = new ProjectDetailsViewModel(model, SolutionTemplate, Logger);
+                await DialogHost.Show(vm, ViewNames.DialogRoot, (sender, args) =>
+                {
+                    var okClicked = args.Parameter is bool parameter && parameter;
+                    if (!okClicked)
+                        return;
+
+                    vm.Model.CopyTemplateProperties(model);
+                });
             }
             catch (Exception exception)
             {

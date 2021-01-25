@@ -55,5 +55,13 @@ namespace MultiTemplateGenerator.UI
 
             return items;
         }
+
+        public static ProjectTemplateModel GetParentProject(this ProjectTemplateModel template)
+        {
+            if (template.Parent == null || template.Parent.IsProject)
+                return template.Parent;
+
+            return template.Parent.GetParentProject();
+        }
     }
 }
