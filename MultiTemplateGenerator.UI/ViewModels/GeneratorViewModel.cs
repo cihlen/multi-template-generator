@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using GalaSoft.MvvmLight.CommandWpf;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Extensions.Logging;
 using MultiTemplateGenerator.UI.Models;
 using MultiTemplateGenerator.UI.Properties;
 using MultiTemplateGenerator.Lib;
 using MultiTemplateGenerator.Lib.Generator;
 using MultiTemplateGenerator.Lib.Models;
 using MultiTemplateGenerator.UI.Helpers;
-using Serilog;
 
 namespace MultiTemplateGenerator.UI.ViewModels
 {
@@ -49,24 +49,24 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private RelayCommand<string> _openDialogCommand;
         private RelayCommand<string> _deleteFolderContentCommand;
 
-        public GeneratorViewModel(ITemplateGeneratorService generatorService, ILogger logger)
+        public GeneratorViewModel(ITemplateGeneratorService generatorService, ILogger<GeneratorViewModel> logger)
             : base(logger)
         {
             try
             {
                 _generatorService = generatorService;
 
-                OptionsVM = new OptionsViewModel(logger);
+                OptionsVM = new OptionsViewModel();
 
                 GetSettings();
 
                 ProjectItems.CollectionChanged += NotifyCollectionChangedEventHandler;
 
-                logger.Information("{method} initialized", nameof(GeneratorViewModel));
+                logger.LogInformation("{method} initialized", nameof(GeneratorViewModel));
             }
             catch (Exception e)
             {
-                logger?.Error(e, "Error initializing {name}", nameof(GeneratorViewModel));
+                logger?.LogError(e, "Error initializing {name}", nameof(GeneratorViewModel));
                 throw;
             }
         }
@@ -478,7 +478,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
                 location.DeleteDirectoryContents();
 
-                Logger.Information("Folder content deleted: {folder}", location);
+                Logger.LogInformation("Folder content deleted: {folder}", location);
 
                 await ShowMessageBoxAsync("Folder content deleted.", "Delete folder content");
             }
@@ -737,14 +737,14 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     }
                 }
 
-                Logger.Information($"Generated {projectCount} projects and {solutionFolderCount} successfully",
+                Logger.LogInformation($"Generated {projectCount} projects and {solutionFolderCount} successfully",
                     projectCount, solutionFolderCount);
                 await ShowMessageBoxAsync($"Generated {projectCount} projects successfully!");
             }
             catch (OperationCanceledException)
             {
                 CloseBusyWindow();
-                Logger.Information("Generating templates canceled!");
+                Logger.LogWarning("Generating templates canceled!");
 
                 await ShowMessageBoxAsync("Generating templates canceled!", null, MessageBoxButton.OK,
                     MessageBoxImage.Exclamation);

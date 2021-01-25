@@ -5,10 +5,10 @@ using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using MultiTemplateGenerator.Lib;
 using MultiTemplateGenerator.UI.Helpers;
-using Serilog;
 
 namespace MultiTemplateGenerator.UI.ViewModels
 {
@@ -25,7 +25,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
         {
             message ??= exception.Message;
 
-            Logger.Error(exception, message);
+            Logger.LogError(exception, message);
             await ShowErrorAsync(message);
         }
 
@@ -33,13 +33,13 @@ namespace MultiTemplateGenerator.UI.ViewModels
         {
             message ??= exception.Message;
 
-            Logger.Error(exception, message);
+            Logger.LogError(exception, message);
             ShowError(message);
         }
 
         protected virtual void SetError(string message)
         {
-            Logger.Error(message);
+            Logger.LogError(message);
             ShowError(message);
         }
 
@@ -163,7 +163,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             if (IsInDesignMode)
                 return "";
 
-            Logger?.Debug($"BrowseForLocation({path})");
+            Logger?.LogDebug($"BrowseForLocation({path})");
 
             var currentFolder = path;
 
@@ -205,7 +205,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             if (IsInDesignMode)
                 return "";
 
-            Logger?.Debug($"SelectFileFromSystem({path})");
+            Logger?.LogDebug($"SelectFileFromSystem({path})");
 
             try
             {

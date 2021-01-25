@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using MultiTemplateGenerator.Lib.Generator;
 using MultiTemplateGenerator.Lib.Models;
-using Serilog;
 
 namespace MultiTemplateGenerator.Lib.Tests.Generator
 {
@@ -14,7 +13,7 @@ namespace MultiTemplateGenerator.Lib.Tests.Generator
     {
         private readonly string _outputDir = TestHelper.OutputDir;
         private readonly string _testSolutionFile = TestHelper.TestSolutionFile;
-        private readonly ILogger _logger = new Mock<ILogger>().Object;
+        private readonly ILogger<TemplateGeneratorService> _logger = new Mock<ILogger<TemplateGeneratorService>>().Object;
 
         [TestInitialize]
         public void TestInit()
@@ -27,19 +26,18 @@ namespace MultiTemplateGenerator.Lib.Tests.Generator
         {
             var templateGeneratorWriter = new TemplateRepository();
             TemplateGeneratorService generator = new TemplateGeneratorService(templateGeneratorWriter, _logger);
-            
+
             IProjectTemplate solutionTemplate = new ProjectTemplate(true)
             {
                 TemplateName = "GeneratedSolutionTemplate"
             };
 
-            var projectItems = generator.GetProjectTemplates(_testSolutionFile, solutionTemplate);
+            var projectItems = generator.GetProjectTemplates(_testSolutionFile, solutionTemplate, true);
 
             var templateOptions = new TemplateOptions
             {
                 SolutionFolder = Path.GetDirectoryName(_testSolutionFile),
                 TargetFolder = _outputDir,
-                UseSolution = true,
                 SolutionTemplate = solutionTemplate,
                 ProjectTemplates = projectItems
             };
@@ -63,7 +61,6 @@ namespace MultiTemplateGenerator.Lib.Tests.Generator
             var templateOptions = new TemplateOptions
             {
                 TargetFolder = _outputDir,
-                UseSolution = true,
                 SolutionTemplate = solutionTemplate,
                 ProjectTemplates = solutionTemplate.Children,
                 SolutionFolder = templateFile.DirectoryName

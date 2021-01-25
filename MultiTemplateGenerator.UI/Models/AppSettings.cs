@@ -1,30 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MultiTemplateGenerator.Lib;
 using MultiTemplateGenerator.Lib.Models;
 using MultiTemplateGenerator.UI.Helpers;
-using Serilog.Core;
 
 namespace MultiTemplateGenerator.UI.Models
 {
     public static class AppSettings
     {
-        private static readonly string _solutionSettingsFile;
+        private static readonly string SolutionSettingsFile;
 
         static AppSettings()
         {
-            _solutionSettingsFile = Path.Combine(Path.GetTempPath(), "SolutionTemplate.json");
-            
-            if (_solutionSettingsFile.FileExists())
+            SolutionSettingsFile = Path.Combine(Path.GetTempPath(), "SolutionTemplate.json");
+
+            if (SolutionSettingsFile.FileExists())
             {
                 try
                 {
-                    SolutionTemplateSettings = JsonFileHelper.ReadJsonFile<ProjectTemplate>(_solutionSettingsFile);
+                    SolutionTemplateSettings = JsonFileHelper.ReadJsonFile<ProjectTemplate>(SolutionSettingsFile);
                 }
                 catch (Exception e)
                 {
@@ -47,7 +42,7 @@ namespace MultiTemplateGenerator.UI.Models
 
         public static void SaveSettings()
         {
-            JsonFileHelper.SaveJsonFile(SolutionTemplateSettings, _solutionSettingsFile);
+            JsonFileHelper.SaveJsonFile(SolutionTemplateSettings, SolutionSettingsFile);
         }
 
     }

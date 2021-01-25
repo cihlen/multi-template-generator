@@ -1,8 +1,7 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using MaterialDesignThemes.Wpf;
-using MultiTemplateGenerator.Lib;
+using Microsoft.Extensions.Logging;
 using MultiTemplateGenerator.UI.Models;
-using Serilog;
 
 namespace MultiTemplateGenerator.UI.ViewModels
 {

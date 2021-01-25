@@ -1,8 +1,8 @@
 ﻿using CommonServiceLocator;
 using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Extensions.Logging;
 using MultiTemplateGenerator.Lib.Generator;
 using MultiTemplateGenerator.UI.Helpers;
-using Serilog;
 
 namespace MultiTemplateGenerator.UI.ViewModels
 {
@@ -19,9 +19,20 @@ namespace MultiTemplateGenerator.UI.ViewModels
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            if (!SimpleIoc.Default.IsRegistered<ILogger>())
+            if (!SimpleIoc.Default.IsRegistered<ILogger<GeneratorViewModel>>())
             {
-                SimpleIoc.Default.Register(LoggerHelper.CreateFileLogger);
+                var loggerFactory = LoggerFactory.Create(builder =>
+                {
+                    builder.AddEventLog(settings =>
+                    {
+                        settings.LogName = "Application";
+                    });
+                });
+
+                ILogger<GeneratorViewModel> generatorVMLogger = loggerFactory.CreateLogger<GeneratorViewModel>();
+
+                SimpleIoc.Default.Register(() => loggerFactory.CreateLogger<GeneratorViewModel>());
+                SimpleIoc.Default.Register(() => loggerFactory.CreateLogger<TemplateGeneratorService>());
             }
 
             SimpleIoc.Default.Register<ITemplateRepository, TemplateRepository>();

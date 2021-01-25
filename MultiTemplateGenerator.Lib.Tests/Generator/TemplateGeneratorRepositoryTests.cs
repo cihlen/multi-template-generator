@@ -123,7 +123,7 @@ namespace MultiTemplateGenerator.Lib.Tests.Generator
 
             foreach (var solutionItem in solutionFileItems)
             {
-                projectTemplates.Add(templateRepository.ReadProjectTemplate(Path.GetDirectoryName(_testSolutionFile), solutionItem, solutionTemplate));
+                projectTemplates.Add(templateRepository.ReadProjectTemplate(Path.GetDirectoryName(_testSolutionFile), solutionItem, solutionTemplate, true));
             }
 
             var solutionTemplateFileName = Path.Combine(_outputDir, "solution.vstemplate");

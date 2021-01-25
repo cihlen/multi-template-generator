@@ -2,13 +2,11 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using MaterialDesignThemes.Wpf;
 using MultiTemplateGenerator.UI.Helpers;
-using Serilog;
 
 namespace MultiTemplateGenerator.UI.ViewModels
 {
     public class OptionsViewModel : ObservableObject
     {
-        public ILogger Logger { get; }
         private readonly PaletteHelper _paletteHelper = new PaletteHelper();
         private IBaseTheme _baseTheme;
         private bool _isDarkMode;
@@ -16,10 +14,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private bool _autoExpand;
         private bool _copyPropertiesFromSolution;
 
-        public OptionsViewModel(ILogger logger)
+        public OptionsViewModel()
         {
-            Logger = logger;
-
             IsDarkMode = false;
         }
 
