@@ -1,0 +1,55 @@
+﻿<UserControl
+    x:Class="MultiTemplateGenerator.UI.Views.OptionsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MultiTemplateGenerator.UI.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:MultiTemplateGenerator.UI.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewModels:OptionsViewModel}"
+    Background="{DynamicResource MaterialDesignPaper}"
+    FontFamily="{DynamicResource MaterialDesignFont}"
+    TextElement.FontSize="13"
+    TextElement.FontWeight="Regular"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="Auto"
+    mc:Ignorable="d">
+    <GroupBox Header="Options">
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Vertical">
+                <StackPanel.Resources>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Orientation" Value="Horizontal" />
+                        <Setter Property="Margin" Value="5" />
+                    </Style>
+                </StackPanel.Resources>
+                <StackPanel>
+                    <ToggleButton IsChecked="{Binding IsDarkMode}" />
+                    <TextBlock Margin="10,0,0,0" Text="Dark Mode" />
+                </StackPanel>
+
+                <StackPanel>
+                    <ToggleButton IsChecked="{Binding AutoExpand}" />
+                    <TextBlock Margin="10,0,0,0" Text="Auto-expand items" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="1"
+                        Margin="5,10,5,5"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom">
+                <Button
+                    Width="90"
+                    Command="{Binding CloseCommand}"
+                    Content="Close" />
+            </StackPanel>
+        </Grid>
+    </GroupBox>
+</UserControl>

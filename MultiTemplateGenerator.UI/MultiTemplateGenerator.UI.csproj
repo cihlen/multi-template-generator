@@ -76,6 +76,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\OptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ProjectDetails.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -165,6 +169,7 @@
     <Compile Include="ViewModels\CommonViewModel.cs" />
     <Compile Include="ViewModels\GeneratorViewModel.cs" />
     <Compile Include="ViewModels\MessageBoxViewModel.cs" />
+    <Compile Include="ViewModels\OptionsViewModel.cs" />
     <Compile Include="ViewModels\ProjectDetailsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Helpers\InvokeHelper.cs" />
@@ -176,6 +181,9 @@
     </Compile>
     <Compile Include="Views\MessageBoxDialog.xaml.cs">
       <DependentUpon>MessageBoxDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\OptionsView.xaml.cs">
+      <DependentUpon>OptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProjectDetails.xaml.cs">
       <DependentUpon>ProjectDetails.xaml</DependentUpon>

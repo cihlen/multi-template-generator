@@ -96,8 +96,8 @@
         <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Style.Resources>
             <Style BasedOn="{StaticResource MaterialDesignTreeViewItem}" TargetType="{x:Type TreeViewItem}">
-                <Setter Property="IsExpanded" Value="True" />
-                <Setter Property="Padding" Value="5" />
+                <Setter Property="IsExpanded" Value="{Binding MainVM.OptionsVM.AutoExpand, Source={StaticResource Locator}, Mode=OneWay}" />
+                <Setter Property="Padding" Value="3" />
             </Style>
         </Style.Resources>
     </Style>

@@ -22,10 +22,6 @@ namespace MultiTemplateGenerator.UI.ViewModels
 {
     public class GeneratorViewModel : CommonViewModel
     {
-        private readonly PaletteHelper _paletteHelper = new PaletteHelper();
-        private bool _isDarkMode = true;
-        private IBaseTheme _baseTheme;
-
         private readonly ITemplateGeneratorService _generatorService;
 
         private ProjectTemplateModel _solutionTemplate;
@@ -60,6 +56,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 _generatorService = generatorService;
 
+                OptionsVM = new OptionsViewModel(logger);
+
                 GetSettings();
 
                 ProjectItems.CollectionChanged += NotifyCollectionChangedEventHandler;
@@ -73,28 +71,9 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
         }
 
+        public OptionsViewModel OptionsVM { get; set; }
+
         #region Properties
-
-        public bool IsDarkMode
-        {
-            get => _isDarkMode;
-            set
-            {
-                _isDarkMode = value;
-                ToggleDarkLightTheme(_isDarkMode);
-                RaisePropertyChanged();
-            }
-        }
-
-        public IBaseTheme BaseTheme
-        {
-            get => _baseTheme;
-            set
-            {
-                _baseTheme = value;
-                RaisePropertyChanged();
-            }
-        }
 
         public bool IsAppMenuOpen
         {
@@ -258,8 +237,6 @@ namespace MultiTemplateGenerator.UI.ViewModels
         {
             VSTemplateFolder = FileExtensions.FindVSTemplateFolder();
 
-            IsDarkMode = Settings.Default.IsDarkMode;
-
             _outputPath = Settings.Default.OutputPath;
 
             if (string.IsNullOrWhiteSpace(_outputPath))
@@ -301,6 +278,9 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
             AutoOpenTemplate = Settings.Default.OpenGeneratedTemplate;
             AutoImportToVS = Settings.Default.AutoImportToVS;
+
+            OptionsVM.IsDarkMode = Settings.Default.IsDarkMode;
+            OptionsVM.AutoExpand = Settings.Default.AutoExpand;
         }
 
         public void SaveSettings()
@@ -308,7 +288,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
             Settings.Default.OpenGeneratedTemplate = AutoOpenTemplate;
             Settings.Default.AutoImportToVS = AutoImportToVS;
             Settings.Default.OutputPath = OutputPath;
-            Settings.Default.IsDarkMode = IsDarkMode;
+            Settings.Default.IsDarkMode = OptionsVM.IsDarkMode;
+            Settings.Default.AutoExpand = OptionsVM.AutoExpand;
 
             SolutionTemplate.TrimProperties();
             SolutionTemplate.CopyTemplateProperties(AppSettings.SolutionTemplateSettings);
@@ -335,16 +316,6 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 SetError(e);
             }
-        }
-
-        private void ToggleDarkLightTheme(bool isDark)
-        {
-            ITheme theme = _paletteHelper.GetTheme();
-            IBaseTheme baseTheme = isDark ? new MaterialDesignDarkTheme() : (IBaseTheme)new MaterialDesignLightTheme();
-            theme.SetBaseTheme(baseTheme);
-            _paletteHelper.SetTheme(theme);
-
-            BaseTheme = baseTheme;
         }
 
         public RelayCommand BrowseSolution => _browseSolution ??= new RelayCommand(() =>
@@ -419,12 +390,17 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 {
                     case ViewNames.About:
                         {
-                            await DialogHost.Show(new AboutViewModel(Logger, IsDarkMode), ViewNames.DialogRoot);
+                            await DialogHost.Show(new AboutViewModel(Logger, OptionsVM.IsDarkMode), ViewNames.DialogRoot);
                         }
                         break;
                     case ViewNames.Busy:
                         {
                             await DialogHost.Show(new BusyViewModel(this), ViewNames.DialogRoot);
+                        }
+                        break;
+                    case ViewNames.Options:
+                        {
+                            await DialogHost.Show(OptionsVM, ViewNames.DialogRoot);
                         }
                         break;
                 }
@@ -555,7 +531,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     }
                 }
 
-                projectItems = projectItems.OrderByDescending(x => x.IsProject).ToList();
+                projectItems = projectItems.OrderBy(x => x.IsProject).ToList();
 
                 foreach (var projectTemplate in projectItems.ToModels())
                 {

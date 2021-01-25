@@ -32,6 +32,9 @@
     <Window.Resources>
         <viewModels:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
 
+        <DataTemplate DataType="{x:Type viewModels:OptionsViewModel}">
+            <views:OptionsView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:ProjectDetailsViewModel}">
             <views:ProjectDetails />
         </DataTemplate>
@@ -101,6 +104,11 @@
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshViewCommand}" />
         <KeyBinding
+        Key="O"
+        Command="{Binding OpenDialogCommand, Mode=OneWay}"
+        CommandParameter="{x:Static helpers:ViewNames.Options}"
+        Modifiers="Control" />
+        <KeyBinding
             Key="O"
             Command="{Binding OpenLocationCommand, Mode=OneWay}"
             CommandParameter="{Binding OutputPath, Mode=OneWay}"
@@ -111,7 +119,7 @@
         <materialDesign:DialogHost
             x:Name="MainDialogHost"
             CloseOnClickAway="False"
-            DialogTheme="{Binding BaseTheme, Mode=OneWay}"
+            DialogTheme="{Binding OptionsVM.BaseTheme, Mode=OneWay}"
             Identifier="DialogRoot">
 
             <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding Path=IsAppMenuOpen}">
@@ -131,10 +139,16 @@
                             Foreground="Black"
                             SelectedIndex="0">
                             <ListBox.Items>
-                                <StackPanel Orientation="Horizontal" Style="{StaticResource ListMenuItem}">
-                                    <ToggleButton IsChecked="{Binding IsDarkMode}" />
-                                    <TextBlock Margin="10,0,0,0" Text="Dark Mode" />
-                                </StackPanel>
+                                <Button
+                                    Command="{Binding MainVM.OpenDialogCommand, Source={StaticResource Locator}}"
+                                    CommandParameter="{x:Static helpers:ViewNames.Options}"
+                                    PreviewMouseLeftButtonUp="MenuItem_PreviewMouseLeftButtonUp"
+                                    Style="{StaticResource ListMenuButton}">
+                                    <StackPanel>
+                                        <materialDesign:PackIcon HorizontalAlignment="Left" Kind="Settings" />
+                                        <TextBlock Text="Options" />
+                                    </StackPanel>
+                                </Button>
 
                                 <Button
                                     Command="{Binding MainVM.OpenInternetCommand, Source={StaticResource Locator}}"
@@ -176,7 +190,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <materialDesign:ColorZone Padding="16" Mode="{Binding IsDarkMode, Converter={StaticResource ColorZoneDarkModeConverter}}">
+                    <materialDesign:ColorZone Padding="16" Mode="{Binding OptionsVM.IsDarkMode, Converter={StaticResource ColorZoneDarkModeConverter}}">
                         <StackPanel Orientation="Horizontal">
                             <ToggleButton
                                 x:Name="MenuToggleButton"

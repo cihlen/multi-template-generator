@@ -98,5 +98,17 @@ namespace MultiTemplateGenerator.UI.Properties {
                 this["IsDarkMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoExpand {
+            get {
+                return ((bool)(this["AutoExpand"]));
+            }
+            set {
+                this["AutoExpand"] = value;
+            }
+        }
     }
 }
