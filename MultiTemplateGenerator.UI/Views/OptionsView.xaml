@@ -16,6 +16,11 @@
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <!--<Style BasedOn="{StaticResource MaterialDesignFlatToggleButton}" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>-->
+    </UserControl.Resources>
     <GroupBox Header="Options">
         <Grid Margin="5">
             <Grid.RowDefinitions>
@@ -25,6 +30,8 @@
 
             <StackPanel Orientation="Vertical">
                 <StackPanel.Resources>
+
+
                     <Style TargetType="StackPanel">
                         <Setter Property="Orientation" Value="Horizontal" />
                         <Setter Property="Margin" Value="5" />
@@ -34,15 +41,15 @@
                     </Style>
                 </StackPanel.Resources>
                 <StackPanel>
-                    <ToggleButton IsChecked="{Binding CopyPropertiesFromSolution}" />
+                    <ToggleButton Cursor="Hand" IsChecked="{Binding CopyPropertiesFromSolution}" />
                     <TextBlock Text="Copy values from solution" />
                 </StackPanel>
                 <StackPanel>
-                    <ToggleButton IsChecked="{Binding AutoExpand}" />
+                    <ToggleButton Cursor="Hand" IsChecked="{Binding AutoExpand}" />
                     <TextBlock Text="Auto-expand items" />
                 </StackPanel>
                 <StackPanel>
-                    <ToggleButton IsChecked="{Binding IsDarkMode}" />
+                    <ToggleButton Cursor="Hand" IsChecked="{Binding IsDarkMode}" />
                     <TextBlock Text="Dark Mode" />
                 </StackPanel>
             </StackPanel>

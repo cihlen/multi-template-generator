@@ -21,15 +21,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
             if (!SimpleIoc.Default.IsRegistered<ILogger<GeneratorViewModel>>())
             {
-                var loggerFactory = LoggerFactory.Create(builder =>
-                {
-                    builder.AddEventLog(settings =>
-                    {
-                        settings.LogName = "Application";
-                    });
-                });
-
-                ILogger<GeneratorViewModel> generatorVMLogger = loggerFactory.CreateLogger<GeneratorViewModel>();
+                var loggerFactory = LoggerHelper.GetLoggerFactory();
 
                 SimpleIoc.Default.Register(() => loggerFactory.CreateLogger<GeneratorViewModel>());
                 SimpleIoc.Default.Register(() => loggerFactory.CreateLogger<TemplateGeneratorService>());

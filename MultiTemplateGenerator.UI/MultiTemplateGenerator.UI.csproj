@@ -132,6 +132,7 @@
     <Compile Include="Extensions\ProjectTemplateConverter.cs" />
     <Compile Include="Helpers\AppHelper.cs" />
     <Compile Include="Helpers\AppUrls.cs" />
+    <Compile Include="Helpers\AsyncHelper.cs" />
     <Compile Include="Helpers\JsonFileHelper.cs" />
     <Compile Include="Helpers\LoggerHelper.cs" />
     <Compile Include="Helpers\ProcessHelper.cs" />

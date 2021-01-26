@@ -62,11 +62,11 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
                 ProjectItems.CollectionChanged += NotifyCollectionChangedEventHandler;
 
-                logger.LogInformation("{method} initialized", nameof(GeneratorViewModel));
+                logger.LogInformation("{method} initialized.", nameof(GeneratorViewModel));
             }
             catch (Exception e)
             {
-                logger?.LogError(e, "Error initializing {name}", nameof(GeneratorViewModel));
+                logger?.LogError(e, "Error initializing {name}.", nameof(GeneratorViewModel));
                 throw;
             }
         }
@@ -122,7 +122,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 }
                 catch (Exception e)
                 {
-                    ShowErrorAsync(e.Message).Wait();
+                    SetError(e, $"Error getting {nameof(TemplateTargetFolder)}.");
                     return null;
                 }
             }
@@ -138,7 +138,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 }
                 catch (Exception e)
                 {
-                    SetError(e.Message);
+                    SetError(e, $"Error getting {nameof(SolutionTemplateFullPath)}.");
                     return null;
                 }
             }

@@ -61,7 +61,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, null, MessageBoxButton.OK, MessageBoxImage.Error);
+                Trace.WriteLine(e);
+                return MessageBox.Show(message, title, buttons, messageBoxImage);
             }
             finally
             {
@@ -74,8 +75,39 @@ namespace MultiTemplateGenerator.UI.ViewModels
             MessageBoxButton buttons = MessageBoxButton.OK,
             MessageBoxImage messageBoxImage = MessageBoxImage.Information)
         {
-            var task = ShowMessageBoxAsync(message, title, buttons, messageBoxImage);
-            return task.ConfigureAwait(false).GetAwaiter().GetResult();
+            //return ShowMessageBoxAsync(message, title, buttons, messageBoxImage).GetAwaiter().GetResult();
+
+            //if (_isMsgBoxOpen)
+            //{
+            //    DialogHost.Close(ViewNames.MessageBoxDialogRoot, MessageBoxResult.Cancel);
+            //}
+
+            //var msgVm = new MessageBoxViewModel(message, title, buttons, messageBoxImage);
+            //_isMsgBoxOpen = true;
+            //try
+            //{
+            //    AsyncHelper.RunSync(() => DialogHost.Show(msgVm, ViewNames.MessageBoxDialogRoot));
+            //}
+            //catch (Exception e)
+            //{
+            //    MessageBox.Show(e.Message, null, MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
+            //finally
+            //{
+            //    _isMsgBoxOpen = false;
+            //}
+            //return msgVm.MessageBoxResult;
+
+            //var result = AsyncHelper.RunSync<MessageBoxResult>(() =>
+            //{
+            //    ShowMessageBoxAsync(message, title, buttons, messageBoxImage).GetAwaiter().GetResult()
+            //    var msgBoxRes = ShowMessageBoxAsync(message, title, buttons, messageBoxImage);
+            //    return InvokeHelper.Invoke(() => msgBoxRes);
+            //});
+            //return result;
+
+            return AsyncHelper.RunSync<MessageBoxResult>(() =>
+                ShowMessageBoxAsync(message, title, buttons, messageBoxImage));
         }
 
         protected async Task ShowErrorAsync(string message, string title = null)
@@ -85,13 +117,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         protected void ShowError(string message, string title = null)
         {
-            message.ShowErrorMessageBox();
-            //ShowMessageBoxAsync(message, title, MessageBoxButton.OK, MessageBoxImage.Error).Wait();
+            ShowMessageBox(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         protected bool ShowQuestion(string message, string title = null, MessageBoxImage messageBoxImage = MessageBoxImage.Question)
         {
-            return message.ShowQuestion(title, messageBoxImage);
+            return ShowMessageBox(message, title, MessageBoxButton.YesNo, messageBoxImage) == MessageBoxResult.Yes;
         }
 
         #region Open/Execute
