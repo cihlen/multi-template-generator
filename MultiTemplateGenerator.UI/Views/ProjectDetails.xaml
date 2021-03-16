@@ -240,7 +240,7 @@
                 Grid.Row="5"
                 Grid.Column="1"
                 Grid.ColumnSpan="3"
-                materialDesign:HintAssist.Hint="Optional: Enter path to icon image"
+                materialDesign:HintAssist.Hint="Required: Enter path to icon image"
                 Command="{Binding Model.BrowseIcon}"
                 Style="{DynamicResource OpenImageTextBox}"
                 Text="{Binding Model.IconImagePath}" />

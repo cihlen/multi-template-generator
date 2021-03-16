@@ -52,6 +52,10 @@
                     <ToggleButton Cursor="Hand" IsChecked="{Binding IsDarkMode}" />
                     <TextBlock Text="Dark Mode" />
                 </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Excluded folders (folder1;folder2):" />
+                    <TextBox Text="{Binding ExcludedFolders}" />
+                </StackPanel>
             </StackPanel>
 
             <StackPanel

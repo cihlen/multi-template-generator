@@ -13,10 +13,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private RelayCommand _closeCommand;
         private bool _autoExpand;
         private bool _copyPropertiesFromSolution;
-
+        private string _excludedFolders;
+        private readonly string defaultExcludedFolders = ".*;bin;obj;TestResults;node_modules";
         public OptionsViewModel()
         {
             IsDarkMode = false;
+            _excludedFolders = defaultExcludedFolders;
         }
 
         public bool AutoExpand
@@ -50,6 +52,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 _baseTheme = value;
                 RaisePropertyChanged();
             }
+        }
+
+        public string ExcludedFolders
+        {
+            get => _excludedFolders;
+            set { _excludedFolders = value; RaisePropertyChanged(); }
         }
 
         public RelayCommand CloseCommand => _closeCommand ??= new RelayCommand(() =>

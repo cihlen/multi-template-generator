@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="MultiTemplateGenerator.1a4e9a58-e41a-4622-80b7-d5f60d6b56d8" Version="0.54" Language="en-US" Publisher="Hans Christian Ihlen" />
+        <Identity Id="MultiTemplateGenerator.1a4e9a58-e41a-4622-80b7-d5f60d6b56d8" Version="0.55" Language="en-US" Publisher="Hans Christian Ihlen" />
         <DisplayName>Multi-Template Generator</DisplayName>
         <Description xml:space="preserve">Multi-project template generator for solutions and existing project templates.</Description>
         <MoreInfo>https://github.com/cihlen/multi-template-generator</MoreInfo>
