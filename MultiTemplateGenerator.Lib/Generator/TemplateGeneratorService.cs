@@ -108,7 +108,7 @@ namespace MultiTemplateGenerator.Lib.Generator
             foreach (var projectTemplate in projectTemplatesList)
             {
                 ct.ThrowIfCancellationRequested();
-                _templateGenerator.CreateProjectTemplate(projectTemplate, options.SolutionFolder, destFolder, true, options.ExcludedFolders, ct);
+                _templateGenerator.CreateProjectTemplate(projectTemplate, options.SolutionFolder, destFolder, true, options.ExcludedFolders, options.ExcludedFiles, ct);
             }
 
             ct.ThrowIfCancellationRequested();

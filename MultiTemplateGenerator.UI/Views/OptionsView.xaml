@@ -56,6 +56,10 @@
                     <TextBlock Text="Excluded folders (folder1;folder2):" />
                     <TextBox Text="{Binding ExcludedFolders}" />
                 </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Excluded files (file1;file2):" />
+                    <TextBox Text="{Binding ExcludedFiles}" />
+                </StackPanel>
             </StackPanel>
 
             <StackPanel

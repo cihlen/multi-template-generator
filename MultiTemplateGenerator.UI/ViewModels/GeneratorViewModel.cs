@@ -298,6 +298,11 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 OptionsVM.ExcludedFolders = Settings.Default.ExcludedFolders;
             }
+
+            if (!string.IsNullOrEmpty(Settings.Default.ExcludedFiles))
+            {
+                OptionsVM.ExcludedFiles = Settings.Default.ExcludedFiles;
+            }
         }
 
         public void SaveSettings()
@@ -308,6 +313,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             Settings.Default.IsDarkMode = OptionsVM.IsDarkMode;
             Settings.Default.AutoExpand = OptionsVM.AutoExpand;
             Settings.Default.ExcludedFolders = OptionsVM.ExcludedFolders;
+            Settings.Default.ExcludedFiles = OptionsVM.ExcludedFiles;
             Settings.Default.CopyPropertiesFromSolution = OptionsVM.CopyPropertiesFromSolution;
 
             SolutionTemplate.TrimProperties();
@@ -508,7 +514,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 ProjectTemplates = ProjectItems.ConvertCheckedProjectTemplates(),
                 TargetFolder = TemplateTargetFolder,
                 AutoImportToVS = AutoImportToVS,
-                ExcludedFolders = OptionsVM.ExcludedFolders
+                ExcludedFolders = OptionsVM.ExcludedFolders,
+                ExcludedFiles = OptionsVM.ExcludedFiles
             };
         }
 

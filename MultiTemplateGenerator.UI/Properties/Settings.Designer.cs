@@ -134,5 +134,17 @@ namespace MultiTemplateGenerator.UI.Properties {
                 this["ExcludedFolders"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExcludedFiles {
+            get {
+                return ((string)(this["ExcludedFiles"]));
+            }
+            set {
+                this["ExcludedFiles"] = value;
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace MultiTemplateGenerator.Lib.Generator
     public interface ITemplateRepository
     {
         void CreateSolutionTemplate(string solutionTemplateFile, IProjectTemplate solutionTemplate, IEnumerable<IProjectTemplate> solutionItems);
-        void CreateProjectTemplate(IProjectTemplate solutionItem, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, CancellationToken ct);
+        void CreateProjectTemplate(IProjectTemplate solutionItem, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, string excludedFiles, CancellationToken ct);
         IProjectTemplate ReadProjectTemplate(string templateFilePath);
         IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent, bool copyFromParent);
         IProjectTemplate ReadSolutionTemplate(string templateFileName);
@@ -67,7 +67,7 @@ namespace MultiTemplateGenerator.Lib.Generator
             sw.WriteLine("</VSTemplate>");
         }
 
-        public void CreateProjectTemplate(IProjectTemplate template, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, CancellationToken ct)
+        public void CreateProjectTemplate(IProjectTemplate template, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, string excludedFiles, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -97,6 +97,7 @@ namespace MultiTemplateGenerator.Lib.Generator
                 sw.WriteLine($"    <Project TargetFileName=\"{projectFile.Name}\" File=\"{projectFile.Name}\" ReplaceParameters=\"true\">");
 
                 var blackList = excludedFolders.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                blackList.AddRange(excludedFiles.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
                 blackList.AddRange(new List<string> { projectTemplateFile.Name, template.TemplateName + ".zip", "__TemplateIcon.*", "__PreviewImage.*" });
 
                 ct.ThrowIfCancellationRequested();
@@ -114,7 +115,7 @@ namespace MultiTemplateGenerator.Lib.Generator
 
             foreach (var child in template.Children)
             {
-                CreateProjectTemplate(child, solutionFolder, destFolder, copyFiles, excludedFolders, ct);
+                CreateProjectTemplate(child, solutionFolder, destFolder, copyFiles, excludedFolders, excludedFiles, ct);
             }
         }
 
