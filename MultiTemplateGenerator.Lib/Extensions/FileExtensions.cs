@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using MultiTemplateGenerator.Lib.Generator;
 using MultiTemplateGenerator.Lib.Models;
 
 namespace MultiTemplateGenerator.Lib
@@ -224,29 +225,7 @@ namespace MultiTemplateGenerator.Lib
             }
         }
 
-        public static void CopyDirectory(this string sourceFolder, string destFolder, List<string> blackList, System.Threading.CancellationToken ct)
-        {
-            ct.ThrowIfCancellationRequested();
-
-            var dir = new DirectoryInfo(sourceFolder);
-            var destDir = new DirectoryInfo(destFolder);
-            var files = dir.GetFilesExcept(blackList).ToList();
-            if (!destDir.Exists && files.Count != 0)
-            {
-                destDir.Create();
-            }
-            foreach (FileInfo file in files)
-            {
-                ct.ThrowIfCancellationRequested();
-                file.CopyTo(Path.Combine(destFolder, file.Name), true);
-            }
-
-            foreach (DirectoryInfo subDir in dir.GetDirectoriesExcept(blackList))
-            {
-                CopyDirectory(subDir.FullName, Path.Combine(destFolder, subDir.Name), blackList, ct);
-            }
-        }
-
+        
         static readonly List<char> InvalidFileNameChars = Path.GetInvalidFileNameChars().ToList();
         static readonly List<char> InvalidPathChars = Path.GetInvalidPathChars().ToList();
 

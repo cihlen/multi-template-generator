@@ -107,6 +107,7 @@
     <Compile Include="Extensions\ConversionExtensions.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Extensions\TemplateExtensions.cs" />
+    <Compile Include="Generator\TemplateFileCopyOptions.cs" />
     <Compile Include="Helpers\VSHelper.cs" />
     <Compile Include="Models\XmlProjectTemplateLink.cs" />
     <Compile Include="Models\XmlSolutionFolder.cs" />

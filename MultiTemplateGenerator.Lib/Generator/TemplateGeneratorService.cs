@@ -31,12 +31,6 @@ namespace MultiTemplateGenerator.Lib.Generator
             _defaultIconPath = "Resources\\MultiTemplateGenerator.png".GetAppPath();
         }
 
-        private List<SolutionProjectItem> GetSolutionFileItems(string solutionFile)
-        {
-            var solution = SolutionFileParser.ParseSolutionFile(solutionFile);
-            return solution.GetSortedHierarchy();
-        }
-
         private IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent, bool copyFromParent)
         {
             _logger.LogDebug($"{nameof(ReadProjectTemplate)} solutionFolder: {solutionFolder}");
@@ -46,13 +40,22 @@ namespace MultiTemplateGenerator.Lib.Generator
         public List<IProjectTemplate> GetProjectTemplates(string solutionFile, IProjectTemplate solutionTemplate, bool copyFromParent)
         {
             _logger.LogDebug($"{nameof(GetProjectTemplates)} started");
-            var solutionFileItems = GetSolutionFileItems(solutionFile);
+            var solutionItems = SolutionFileParser.ParseSolutionFile(solutionFile);
+            var firstItem = solutionItems.FirstOrDefault();
+
+            var solutionFileItems = solutionItems.GetSortedHierarchy();
+
             var projectItems = new List<IProjectTemplate>();
 
             foreach (var solutionItem in solutionFileItems)
             {
-                projectItems.Add(
-                    ReadProjectTemplate(Path.GetDirectoryName(solutionFile), solutionItem, solutionTemplate, copyFromParent));
+                var template = ReadProjectTemplate(Path.GetDirectoryName(solutionFile), solutionItem, solutionTemplate, copyFromParent);
+                template.IsMainProject = template.TemplateName.Equals(firstItem?.Name);
+                foreach (var childTemplate in template.Children.GetTemplatesFlattened())
+                {
+                    childTemplate.IsMainProject = childTemplate.TemplateName.Equals(firstItem?.Name);
+                }
+                projectItems.Add(template);
             }
 
             _logger.LogDebug($"{nameof(GetProjectTemplates)}: {projectItems.Count} project templates found");
@@ -103,12 +106,14 @@ namespace MultiTemplateGenerator.Lib.Generator
 
             var projectTemplatesList = projectTemplates.ToList();
 
+            var mainProject = projectTemplatesList.GetTemplatesFlattened().Single(x => x.IsMainProject);
+
             _logger.LogDebug($"Creating {projectTemplatesList.Count} project templates...");
             //Create project templates
             foreach (var projectTemplate in projectTemplatesList)
             {
                 ct.ThrowIfCancellationRequested();
-                _templateGenerator.CreateProjectTemplate(projectTemplate, options.SolutionFolder, destFolder, true, options.ExcludedFolders, options.ExcludedFiles, ct);
+                _templateGenerator.CreateProjectTemplate(projectTemplate, mainProject.DefaultName, options.SolutionFolder, destFolder, true, options.ExcludedFolders ?? string.Empty, options.ExcludedFiles ?? string.Empty, ct);
             }
 
             ct.ThrowIfCancellationRequested();

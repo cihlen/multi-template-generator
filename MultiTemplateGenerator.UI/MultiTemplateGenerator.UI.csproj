@@ -121,9 +121,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\SearchTextBox.cs" />
+    <Compile Include="Converters\MultiBoolBrushConverter.cs" />
     <Compile Include="Converters\BoolConverter.cs" />
     <Compile Include="Converters\ColorZoneDarkModeConverter.cs" />
-    <Compile Include="Converters\ForegroundDarkModeConverter.cs" />
+    <Compile Include="Converters\BoolBrushConverter.cs" />
     <Compile Include="Converters\MessageBoxButtonVisibilityConverter.cs" />
     <Compile Include="Converters\VisibilityConverter.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />

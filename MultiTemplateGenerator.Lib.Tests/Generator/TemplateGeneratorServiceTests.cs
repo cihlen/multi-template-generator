@@ -39,7 +39,7 @@ namespace MultiTemplateGenerator.Lib.Tests.Generator
                 SolutionFolder = Path.GetDirectoryName(_testSolutionFile),
                 TargetFolder = _outputDir,
                 SolutionTemplate = solutionTemplate,
-                ProjectTemplates = projectItems
+                ProjectTemplates = projectItems,
             };
 
             generator.GenerateTemplate(templateOptions, CancellationToken.None);

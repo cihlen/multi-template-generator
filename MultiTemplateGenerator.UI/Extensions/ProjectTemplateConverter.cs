@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MultiTemplateGenerator.UI.Models;
 using MultiTemplateGenerator.Lib;
@@ -16,14 +17,14 @@ namespace MultiTemplateGenerator.UI
             source.CopyPropertiesTo(target, PropertyExcludes);
         }
 
-        public static ProjectTemplateModel ToModel(this IProjectTemplate item, ProjectTemplateModel parent)
+        public static ProjectTemplateModel ToModel(this IProjectTemplate item, ProjectTemplateModel parent, Action<ProjectTemplateModel, string> propertyChanged)
         {
-            var model = new ProjectTemplateModel(item.IsProject, parent, null);
+            var model = new ProjectTemplateModel(item.IsProject, parent, propertyChanged);
 
             item.CopyTemplateProperties(model);
             foreach (var itemChild in item.Children)
             {
-                model.Children.Add(itemChild.ToModel(model));
+                model.Children.Add(itemChild.ToModel(model, propertyChanged));
             }
 
             model.SetItemImage();
@@ -31,11 +32,11 @@ namespace MultiTemplateGenerator.UI
             return model;
         }
 
-        public static IEnumerable<ProjectTemplateModel> ToModels(this IEnumerable<IProjectTemplate> items, ProjectTemplateModel parent = null)
+        public static IEnumerable<ProjectTemplateModel> ToModels(this IEnumerable<IProjectTemplate> items, ProjectTemplateModel parent = null, Action<ProjectTemplateModel, string> propertyChanged = null)
         {
             foreach (var item in items)
             {
-                yield return item.ToModel(parent);
+                yield return item.ToModel(parent, propertyChanged);
             }
         }
 

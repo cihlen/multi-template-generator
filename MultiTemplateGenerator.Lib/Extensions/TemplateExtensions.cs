@@ -10,7 +10,7 @@ namespace MultiTemplateGenerator.Lib
 {
     public static class MultiTemplateExtensions
     {
-        private static readonly WildcardComparer WildcardComparer = new();
+        private static readonly WildcardComparer WildcardComparer = new WildcardComparer();
 
         public static string GetProjectTypeFromExtension(this string filename)
         {
@@ -243,6 +243,34 @@ namespace MultiTemplateGenerator.Lib
                 return string.Empty;
 
             return Path.GetFullPath(Path.Combine(targetFolder, templateName.GetSafeFileName() + ".vstemplate"));
+        }
+
+        public static bool IsCodeFile(this string extension)
+        {
+            extension = extension.TrimStart(new[] {'.'}).ToLower();
+            switch (extension)
+            {
+                case "csproj":
+                case "cs":
+                case "cshtml":
+                case "fsproj":
+                case "fs":
+                case "wapproj":
+                case "sqlproj":
+                case "vbproj":
+                case "vbp":
+                case "vcxproj":
+                case "njsproj":
+                case "pyproj":
+                case "razor":
+                case "vb":
+                case "vbhtml":
+                case "xaml":
+                    {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -10,6 +10,7 @@
     xmlns:models="clr-namespace:MultiTemplateGenerator.UI.Models"
     xmlns:viewModels="clr-namespace:MultiTemplateGenerator.UI.ViewModels"
     xmlns:views="clr-namespace:MultiTemplateGenerator.UI.Views"
+    xmlns:converters="clr-namespace:MultiTemplateGenerator.UI.Converters"
     x:Name="MainWindow"
     Title="Multi-Template Generator"
     Width="700"
@@ -31,6 +32,8 @@
     mc:Ignorable="d">
     <Window.Resources>
         <viewModels:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
+        
+        <converters:MultiBoolBrushConverter x:Key="IsMainBrushConverter" TrueValue="DarkSlateBlue" FalseValue="#FFC778E8"/>
 
         <DataTemplate DataType="{x:Type viewModels:OptionsViewModel}">
             <views:OptionsView />
@@ -481,6 +484,12 @@
                                                 </ControlTemplate>
                                             </Setter.Value>
                                         </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMainProject}"
+                                                         Value="True">
+                                                <Setter Property="FontStyle" Value="Italic"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                     </Style>
 
                                     <Style
@@ -488,11 +497,34 @@
                                         BasedOn="{StaticResource DetailsLink}"
                                         TargetType="Label">
                                         <Setter Property="Visibility" Value="{Binding IsProject, Converter={StaticResource BoolVisibilityConverter}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMainProject}"
+                                                         Value="True">
+                                                <Setter Property="FontStyle" Value="Italic"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                     </Style>
 
-                                    <HierarchicalDataTemplate DataType="{x:Type models:ProjectTemplateModel}" ItemsSource="{Binding Children, Mode=OneWay}">
+                                    <HierarchicalDataTemplate DataType="{x:Type models:ProjectTemplateModel}"
+                                                              ItemsSource="{Binding Children, Mode=OneWay}"
+                                                              >
+                                        <HierarchicalDataTemplate.Resources>
+                                                
+                                            <ContextMenu x:Key="TemplateContextMenu">
+                                                <MenuItem Header="Set as main project" IsCheckable="True" 
+                                                          IsChecked="{Binding IsMainProject}" />
+                                            </ContextMenu>
 
-                                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                        </HierarchicalDataTemplate.Resources>
+
+                                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                                              ContextMenu="{DynamicResource TemplateContextMenu}">
+                                            <Grid.Background>
+                                                <MultiBinding Converter="{StaticResource IsMainBrushConverter}">
+                                                    <Binding Path="MainVM.OptionsVM.IsDarkMode" Source="{StaticResource Locator}" Mode="OneWay"></Binding>
+                                                    <Binding Path="IsMainProject" Mode="OneWay" />
+                                                </MultiBinding>
+                                            </Grid.Background>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />

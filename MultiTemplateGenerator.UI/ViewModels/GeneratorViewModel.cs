@@ -549,12 +549,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     var solutionTemplate = _generatorService.ReadSolutionTemplate(SolutionFile);
                     projectItems.AddRange(solutionTemplate.Children);
                     solutionTemplate.Children.Clear();
-                    SolutionTemplate = solutionTemplate.ToModel(null);
+                    SolutionTemplate = solutionTemplate.ToModel(null, TemplatePropertyChanged);
                 }
 
                 projectItems = projectItems.OrderBy(x => x.IsProject).ToList();
 
-                foreach (var projectTemplate in projectItems.ToModels())
+                foreach (var projectTemplate in projectItems.ToModels(null, TemplatePropertyChanged))
                 {
                     ProjectItems.Add(projectTemplate);
                 }
@@ -567,6 +567,33 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 RaisePropertyChanged(nameof(ProjectItems));
                 SetProjectCounts();
+            }
+        }
+
+        private void TemplatePropertyChanged(ProjectTemplateModel template, string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "IsMainProject":
+                {
+                    var previousMain = ProjectItems.GetTemplatesFlattened().SingleOrDefault(x => x != template && x.IsMainProject);
+                    if (template.IsMainProject)
+                    {
+                        if (previousMain != null)
+                        {
+                            previousMain.IsMainProject = false;
+                        }
+                    }
+                    else
+                    {
+                        if (previousMain == null)
+                        {
+                            template.IsMainProject = true;
+                        }
+                    }
+
+                    break;
+                }
             }
         }
 
@@ -831,7 +858,10 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 errors.Add(@"You have to select at least one project.");
             }
-
+            else if (!flattenedProjectTemplates.Any(x => x.IsMainProject))
+            {
+                errors.Add(@"You have to select at least one as main project.");
+            }
             return errors;
         }
 

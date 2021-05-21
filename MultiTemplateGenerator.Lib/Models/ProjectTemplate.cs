@@ -25,6 +25,7 @@ namespace MultiTemplateGenerator.Lib.Models
         bool CreateNewFolder { get; set; }
         bool IsHidden { get; set; }
 
+        bool IsMainProject { get; set; }
         bool IsProject { get; }
         List<IProjectTemplate> Children { get; }
         bool ProvideDefaultName { get; set; }
@@ -91,6 +92,7 @@ namespace MultiTemplateGenerator.Lib.Models
         public string PreviewImagePath { get; set; }
         public bool CreateNewFolder { get; set; } = true;
         public bool IsHidden { get; set; }
+        public bool IsMainProject { get; set; }
         public bool IsProject { get; }
         public List<IProjectTemplate> Children { get; } = new List<IProjectTemplate>();
         public bool ProvideDefaultName { get; set; } = true;

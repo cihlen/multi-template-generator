@@ -7,7 +7,7 @@ using System.Windows.Media;
 namespace MultiTemplateGenerator.UI.Converters
 {
     [ValueConversion(typeof(bool), typeof(Brush))]
-    public class ForegroundDarkModeConverter : IValueConverter
+    public class BoolBrushConverter : IValueConverter
     {
         public Brush TrueValue { get; set; } = Brushes.White;
         public Brush FalseValue { get; set; } = SystemColors.ControlTextBrush;

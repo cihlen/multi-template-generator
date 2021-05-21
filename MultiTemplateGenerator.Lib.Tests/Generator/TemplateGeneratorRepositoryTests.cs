@@ -96,13 +96,27 @@ namespace MultiTemplateGenerator.Lib.Tests.Generator
 
             IProjectTemplate projectTemplate = templateGeneratorWriter.ReadProjectTemplate(templateFile.FullName);
 
-            templateGeneratorWriter.CreateProjectTemplate(projectTemplate, templateFile.Directory.Parent.FullName, _outputDir, false, CancellationToken.None);
+            templateGeneratorWriter.CreateProjectTemplate(projectTemplate, projectTemplate.DefaultName, templateFile.Directory.Parent.FullName, _outputDir, false, string.Empty, string.Empty, CancellationToken.None);
 
             var generatedTemplateFile = new FileInfo(projectTemplate.GetTemplateFileName(_outputDir));
             IProjectTemplate projectTemplateWritten = templateGeneratorWriter.ReadProjectTemplate(generatedTemplateFile.FullName);
 
             TestHelper.AssertProjectTemplate(projectTemplate, projectTemplateWritten);
         }
+
+        [TestMethod()]
+        public void ReplaceFileWithTemplateParameters()
+        {
+            string testCodeFile = @"..\..\..\TestData\SolutionTemplates\WebSolution\WebApplicationTest\Startup.cs".GetAppPath();
+            var tempCodeFile = Path.GetTempFileName();
+
+            ITemplateRepository templateRepository = new TemplateRepository();
+
+            var changes = templateRepository.ReplaceWithTemplateParameters(testCodeFile, "WebApplicationTest", tempCodeFile);
+
+            Assert.AreEqual(1, changes);
+        }
+
 
         [TestMethod()]
         public void CreateSolutionTemplateTest()

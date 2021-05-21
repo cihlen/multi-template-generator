@@ -21,7 +21,7 @@
     TextOptions.TextRenderingMode="Auto"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <converters:ForegroundDarkModeConverter x:Key="ForegroundConverter" />
+        <converters:BoolBrushConverter x:Key="ForegroundConverter" TrueValue="White" FalseValue="{x:Static SystemColors.ControlTextBrush}"/>
     </UserControl.Resources>
     <Grid Margin="20">
         <StackPanel Orientation="Vertical">

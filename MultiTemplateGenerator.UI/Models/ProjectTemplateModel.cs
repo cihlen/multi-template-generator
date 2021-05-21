@@ -39,6 +39,7 @@ namespace MultiTemplateGenerator.UI.Models
         private string _previewImagePath;
         private bool _isHidden;
         private bool _isChecked = true;
+        private bool _isMainProject;
 
         private string _projectTypeTags;
         private ObservableCollection<CheckedItemModel> _platformTagsList;
@@ -137,6 +138,31 @@ namespace MultiTemplateGenerator.UI.Models
             RaisePropertyChanged(nameof(IsChecked));
 
             Parent?.SetParentChecked(isChecked);
+        }
+
+        public bool IsMainProject
+        {
+            get => _isMainProject;
+            set
+            {
+                if (_isMainProject == value)
+                    return;
+
+                _isMainProject = value;
+                RaisePropertyChanged();
+
+                //foreach (var child in Children.Cast<ProjectTemplateModel>())
+                //{
+                //    child.IsChecked = _isChecked;
+                //}
+
+                //if (_isChecked)
+                //{
+                //    Parent?.SetParentChecked(true);
+                //}
+
+                _propertyChanged?.Invoke(this, nameof(IsMainProject));
+            }
         }
 
         public int SortOrder

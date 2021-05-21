@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,11 +15,12 @@ namespace MultiTemplateGenerator.Lib.Generator
     public interface ITemplateRepository
     {
         void CreateSolutionTemplate(string solutionTemplateFile, IProjectTemplate solutionTemplate, IEnumerable<IProjectTemplate> solutionItems);
-        void CreateProjectTemplate(IProjectTemplate solutionItem, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, string excludedFiles, CancellationToken ct);
+        void CreateProjectTemplate(IProjectTemplate template, string mainProjectName, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, string excludedFiles, CancellationToken ct);
         IProjectTemplate ReadProjectTemplate(string templateFilePath);
         IProjectTemplate ReadProjectTemplate(string solutionFolder, SolutionProjectItem item, IProjectTemplate parent, bool copyFromParent);
         IProjectTemplate ReadSolutionTemplate(string templateFileName);
         bool IsTagsSupported { get; }
+        int ReplaceWithTemplateParameters(string fileName, string defaultName, string destFileName);
     }
 
     public class TemplateRepository : ITemplateRepository
@@ -67,7 +69,7 @@ namespace MultiTemplateGenerator.Lib.Generator
             sw.WriteLine("</VSTemplate>");
         }
 
-        public void CreateProjectTemplate(IProjectTemplate template, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, string excludedFiles, CancellationToken ct)
+        public void CreateProjectTemplate(IProjectTemplate template, string mainProjectName, string solutionFolder, string destFolder, bool copyFiles, string excludedFolders, string excludedFiles, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -105,7 +107,9 @@ namespace MultiTemplateGenerator.Lib.Generator
 
                 if (copyFiles)
                 {
-                    projectFolder.CopyDirectory(Path.Combine(destFolder, template.TemplateName), blackList, ct);
+                    var copyOptions = new TemplateFileCopyOptions {BlackList = blackList, DefaultName = mainProjectName };
+
+                    CopyDirectory(projectFolder, Path.Combine(destFolder, template.TemplateName), copyOptions, ct);
                 }
 
                 sw.WriteLine("    </Project>");
@@ -115,7 +119,7 @@ namespace MultiTemplateGenerator.Lib.Generator
 
             foreach (var child in template.Children)
             {
-                CreateProjectTemplate(child, solutionFolder, destFolder, copyFiles, excludedFolders, excludedFiles, ct);
+                CreateProjectTemplate(child, mainProjectName, solutionFolder, destFolder, copyFiles, excludedFolders, excludedFiles, ct);
             }
         }
 
@@ -476,7 +480,12 @@ namespace MultiTemplateGenerator.Lib.Generator
             //    projectTemplates.Add(ReadProjectTemplate(projectTemplateFile));
             //}
 
+            var firstProjectName = allTemplateItems.GetProjectTemplateLinks().FirstOrDefault()?.ProjectName;
+
             var orderedChildItems = ToProjectTemplates(allTemplateItems, solutionFolder).ToList();
+            var mainProject = orderedChildItems.GetTemplatesFlattened().Single(x => x.TemplateName.Equals(firstProjectName));
+            mainProject.IsMainProject = true;
+
             solutionTemplate.Children.AddRange(orderedChildItems);
             return solutionTemplate;
         }
@@ -583,5 +592,71 @@ namespace MultiTemplateGenerator.Lib.Generator
         //        };
         //    }
         //}
+
+        public void CopyDirectory(string sourceFolder, string destFolder, TemplateFileCopyOptions copyOptions, System.Threading.CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var dir = new DirectoryInfo(sourceFolder);
+            var destDir = new DirectoryInfo(destFolder);
+            var files = dir.GetFilesExcept(copyOptions.BlackList).ToList();
+            if (!destDir.Exists && files.Count != 0)
+            {
+                destDir.Create();
+            }
+
+            foreach (FileInfo file in files)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                if (file.Extension.IsCodeFile())
+                {
+                    ReplaceWithTemplateParameters(file.FullName, copyOptions.DefaultName, Path.Combine(destFolder, file.Name));
+                }
+                else
+                {
+                    file.CopyTo(Path.Combine(destFolder, file.Name), true);
+                }
+            }
+
+            foreach (DirectoryInfo subDir in dir.GetDirectoriesExcept(copyOptions.BlackList))
+            {
+                CopyDirectory(subDir.FullName, Path.Combine(destFolder, subDir.Name), copyOptions, ct);
+            }
+        }
+
+
+        public int ReplaceWithTemplateParameters(string fileName, string defaultName, string destFileName)
+        {
+            var allLines = File.ReadLines(fileName).ToList();
+            var newLines = new List<string>(allLines.Count);
+            var changesMade = 0;
+            foreach (var line in allLines)
+            {
+                var newLine = line
+                    .Replace($"{defaultName}", "$ext_safeprojectname$");
+                newLines.Add(newLine);
+
+                if (!line.Equals(newLine))
+                {
+                    changesMade++;
+                }
+            }
+
+            if (changesMade != 0)
+            {
+                if (File.Exists(destFileName))
+                {
+                    File.Delete(destFileName);
+                }
+                File.WriteAllLines(destFileName, newLines);
+            }
+            else
+            {
+                File.Copy(fileName, destFileName, true);
+            }
+
+            return changesMade;
+        }
     }
 }

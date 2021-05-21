@@ -13,7 +13,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
         public ProjectDetailsViewModel(ProjectTemplateModel model, ProjectTemplateModel solutionModel, ILogger logger)
             : base(logger)
         {
-            Model = model.ToModel(model.Parent);
+            Model = model.ToModel(model.Parent, null);
             SolutionModel = solutionModel;
         }
 
