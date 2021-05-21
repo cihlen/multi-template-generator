@@ -16,6 +16,7 @@ namespace MultiTemplateGenerator.Lib.Generator
         IProjectTemplate ReadSolutionTemplate(string solutionTemplateFile);
         void GenerateTemplate(TemplateOptions generateOptions, CancellationToken cancellationToken);
         bool IsTagsSupported { get; }
+        void PackageTemplate(string sourceFolder, IProjectTemplate solutionTemplate, bool autoImportToVS, CancellationToken ct);
     }
 
     public class TemplateGeneratorService : ITemplateGeneratorService
@@ -120,34 +121,68 @@ namespace MultiTemplateGenerator.Lib.Generator
 
             _logger.LogDebug($"Creating solution template...");
             _templateGenerator.CreateSolutionTemplate(multiTemplateFile.FullName, solutionTemplate, projectTemplatesList);
+            ct.ThrowIfCancellationRequested();
 
-            _logger.LogDebug($"Creating zip file...");
+            PackageTemplate(destFolder, solutionTemplate, options.AutoImportToVS, ct);
+
+            //_logger.LogDebug($"Creating zip file...");
+            ////Zip files
+            //var zipFileName = Path.Combine(destFolder, solutionTemplate.TemplateName + ".zip");
+
+            //FastZip zip = new FastZip();
+            //var tempZipFile = Path.GetTempFileName();
+
+            //ct.ThrowIfCancellationRequested();
+            //zip.CreateZip(tempZipFile, destFolder, true, null);
+
+            //File.Move(tempZipFile, zipFileName);
+
+            //ct.ThrowIfCancellationRequested();
+            //if (options.AutoImportToVS)
+            //{
+            //    _logger.LogDebug($"Importing zip file to VS template folder...");
+            //    var vsFolder = Path.Combine(FileExtensions.FindVSTemplateFolder(), solutionTemplate.LanguageTag.GetTemplateFolderNameByLanguage());
+            //    if (!vsFolder.DirectoryExists())
+            //        vsFolder = FileExtensions.FindVSTemplateFolder();
+
+            //    File.Copy(zipFileName, Path.Combine(vsFolder, Path.GetFileName(zipFileName)), true);
+            //}
+
+            _logger.LogInformation("Generating templates completed");
+        }
+
+        public bool IsTagsSupported => _templateGenerator.IsTagsSupported;
+
+        public void PackageTemplate(string sourceFolder, IProjectTemplate solutionTemplate, bool autoImportToVS, CancellationToken ct)
+        {
+            _logger.LogDebug($"Packaging template zip file...");
             //Zip files
-            var zipFileName = Path.Combine(destFolder, solutionTemplate.TemplateName + ".zip");
+            var zipFileName = Path.Combine(sourceFolder, solutionTemplate.TemplateName + ".zip");
 
             FastZip zip = new FastZip();
             var tempZipFile = Path.GetTempFileName();
 
             ct.ThrowIfCancellationRequested();
-            zip.CreateZip(tempZipFile, destFolder, true, null);
+            zip.CreateZip(tempZipFile, sourceFolder, true, null);
 
+            if (File.Exists(zipFileName))
+            {
+                File.Delete(zipFileName);
+            }
             File.Move(tempZipFile, zipFileName);
 
             ct.ThrowIfCancellationRequested();
-            if (options.AutoImportToVS)
+            if (autoImportToVS)
             {
                 _logger.LogDebug($"Importing zip file to VS template folder...");
                 var vsFolder = Path.Combine(FileExtensions.FindVSTemplateFolder(), solutionTemplate.LanguageTag.GetTemplateFolderNameByLanguage());
                 if (!vsFolder.DirectoryExists())
                     vsFolder = FileExtensions.FindVSTemplateFolder();
 
+                ct.ThrowIfCancellationRequested();
                 File.Copy(zipFileName, Path.Combine(vsFolder, Path.GetFileName(zipFileName)), true);
             }
-
-            _logger.LogInformation("Generating templates completed");
         }
-
-        public bool IsTagsSupported => _templateGenerator.IsTagsSupported;
 
         public IEnumerable<IProjectTemplate> GetProjectTemplatesFromFolder(string destFolder)
         {

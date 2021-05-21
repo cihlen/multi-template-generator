@@ -267,6 +267,16 @@
                                 ToolTip="Delete output directory content">
                                 <materialDesign:PackIcon Kind="TrashCanOutline" />
                             </Button>
+                            <Button
+                                Width="20"
+                                Height="20"
+                                Padding="0"
+                                HorizontalAlignment="Right"
+                                Command="{Binding PackageTemplateCommand}"
+                                CommandParameter="{Binding OutputPath}"
+                                ToolTip="Package generated template">
+                                <materialDesign:PackIcon Kind="Package" />
+                            </Button>
                         </StackPanel>
                         <controls:SearchTextBox
                             Grid.Row="0"

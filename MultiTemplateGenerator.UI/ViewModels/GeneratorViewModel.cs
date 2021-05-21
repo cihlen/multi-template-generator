@@ -48,6 +48,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private RelayCommand _refreshViewCommand;
         private RelayCommand<string> _openDialogCommand;
         private RelayCommand<string> _deleteFolderContentCommand;
+        private RelayCommand<string> _packageTemplateCommand;
 
         public GeneratorViewModel(ITemplateGeneratorService generatorService, ILogger<GeneratorViewModel> logger)
             : base(logger)
@@ -401,6 +402,10 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public RelayCommand<string> DeleteFolderContentCommand => _deleteFolderContentCommand ??=
             new RelayCommand<string>(async (location) => await DeleteFolderContent(location),
+                (location) => !IsInDesignMode && !IsBusy && location.DirectoryExists());
+
+        public RelayCommand<string> PackageTemplateCommand => _packageTemplateCommand ??=
+            new RelayCommand<string>(async (location) => await PackageTemplateContent(location),
                 (location) => !IsInDesignMode && !IsBusy && location.DirectoryExists());
 
         public RelayCommand<string> OpenDialogCommand => _openDialogCommand ??= new RelayCommand<string>(
@@ -803,6 +808,70 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 RaisePropertyChanged(nameof(TemplateTargetFolder));
                 RaisePropertyChanged(nameof(SolutionTemplateFullPath));
                 SetProjectCounts();
+            }
+        }
+
+        private async Task PackageTemplateContent(string outputPath)
+        {
+            
+            try
+            {
+                var selectedTemplate = SelectFileFromSystem(null, outputPath, "Select template", ".vstemplate", "Template file (*.vstemplate)|*.vstemplate");
+                if (string.IsNullOrEmpty(selectedTemplate))
+                    return;
+
+                IsBusy = true;
+                NewCancelSource();
+
+                var solutionTemplate = _generatorService.ReadSolutionTemplate(selectedTemplate);
+                if (solutionTemplate.Children.Count == 0)
+                {
+                    await ShowErrorAsync("Template is missing child templates.", "Validation");
+                    return;
+                }
+
+                var confirmContentMsg =
+                    $"Are you sure you want to package the selected template?";
+                var msgBoxResult = await ShowMessageBoxAsync(confirmContentMsg,
+                    "Package Templates", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
+                if (!msgBoxResult)
+                {
+                    return;
+                }
+
+                ShowBusyWindow();
+
+                await Task.Run(() =>
+                    {
+                        _generatorService.PackageTemplate(selectedTemplate.GetDirectoryPath(), solutionTemplate, AutoImportToVS, CancelSource.Token);
+                    },
+                    CancelSource.Token);
+
+                CancelSource.Token.ThrowIfCancellationRequested();
+
+                CloseBusyWindow();
+
+                Logger.LogInformation($"Packaged template successfully");
+                await ShowMessageBoxAsync($"Packaged template successfully!");
+            }
+            catch (OperationCanceledException)
+            {
+                CloseBusyWindow();
+                Logger.LogWarning("Packaging templates canceled!");
+
+                await ShowMessageBoxAsync("Packaging templates canceled!", null, MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
+            }
+            catch (Exception ex)
+            {
+                CloseBusyWindow();
+                await SetErrorAsync(ex, $"Error packaging templates: {ex.Message}");
+            }
+            finally
+            {
+                DisposeCancelSource();
+                IsBusy = false;
+                CloseBusyWindow();
             }
         }
 
