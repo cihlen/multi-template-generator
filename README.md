@@ -15,7 +15,7 @@ The source code also includes a WPF project so the Generator can also be execute
 4. Select a output directory.
 5. Click Generate to generate selected project templates.
 
-![Screenshot](https://app.quickinstaller.net/downloads/multi-template-generator/Multi-Template_Generator_Window.png "Screenshot")
+![Screenshot](https://github.com/cihlen/multi-template-generator/blob/develop/Graphics/Doc/Multi-Template_Generator_Window.png "Screenshot")
 
 #### Generation Process
 1. Generate selected project templates and copy template icon and preview image to %OUTPUTDIR%\%TEMPLATE-NAME% directory.
