@@ -125,28 +125,28 @@ namespace MultiTemplateGenerator.Lib.Generator
 
             PackageTemplate(destFolder, solutionTemplate, options.AutoImportToVS, ct);
 
-            //_logger.LogDebug($"Creating zip file...");
-            ////Zip files
-            //var zipFileName = Path.Combine(destFolder, solutionTemplate.TemplateName + ".zip");
+            _logger.LogDebug($"Creating zip file...");
+            //Zip files
+            var zipFileName = Path.Combine(destFolder, solutionTemplate.TemplateName + ".zip");
 
-            //FastZip zip = new FastZip();
-            //var tempZipFile = Path.GetTempFileName();
+            FastZip zip = new FastZip();
+            var tempZipFile = Path.GetTempFileName();
 
-            //ct.ThrowIfCancellationRequested();
-            //zip.CreateZip(tempZipFile, destFolder, true, null);
+            ct.ThrowIfCancellationRequested();
+            zip.CreateZip(tempZipFile, destFolder, true, null);
 
-            //File.Move(tempZipFile, zipFileName);
+            File.Move(tempZipFile, zipFileName);
 
-            //ct.ThrowIfCancellationRequested();
-            //if (options.AutoImportToVS)
-            //{
-            //    _logger.LogDebug($"Importing zip file to VS template folder...");
-            //    var vsFolder = Path.Combine(FileExtensions.FindVSTemplateFolder(), solutionTemplate.LanguageTag.GetTemplateFolderNameByLanguage());
-            //    if (!vsFolder.DirectoryExists())
-            //        vsFolder = FileExtensions.FindVSTemplateFolder();
+            ct.ThrowIfCancellationRequested();
+            if (options.AutoImportToVS)
+            {
+                _logger.LogDebug($"Importing zip file to VS template folder...");
+                var vsFolder = Path.Combine(FileExtensions.FindVSTemplateFolder(), solutionTemplate.LanguageTag.GetTemplateFolderNameByLanguage());
+                if (!vsFolder.DirectoryExists())
+                    vsFolder = FileExtensions.FindVSTemplateFolder();
 
-            //    File.Copy(zipFileName, Path.Combine(vsFolder, Path.GetFileName(zipFileName)), true);
-            //}
+                File.Copy(zipFileName, Path.Combine(vsFolder, Path.GetFileName(zipFileName)), true);
+            }
 
             _logger.LogInformation("Generating templates completed");
         }
@@ -159,29 +159,30 @@ namespace MultiTemplateGenerator.Lib.Generator
             //Zip files
             var zipFileName = Path.Combine(sourceFolder, solutionTemplate.TemplateName + ".zip");
 
-            FastZip zip = new FastZip();
-            var tempZipFile = Path.GetTempFileName();
+            
+            //FastZip zip = new FastZip();
+            //var tempZipFile = Path.GetTempFileName();
 
-            ct.ThrowIfCancellationRequested();
-            zip.CreateZip(tempZipFile, sourceFolder, true, null);
+            //ct.ThrowIfCancellationRequested();
+            //zip.CreateZip(tempZipFile, sourceFolder, true, null);
 
-            if (File.Exists(zipFileName))
-            {
-                File.Delete(zipFileName);
-            }
-            File.Move(tempZipFile, zipFileName);
+            //if (File.Exists(zipFileName))
+            //{
+            //    File.Delete(zipFileName);
+            //}
+            //File.Move(tempZipFile, zipFileName);
 
-            ct.ThrowIfCancellationRequested();
-            if (autoImportToVS)
-            {
-                _logger.LogDebug($"Importing zip file to VS template folder...");
-                var vsFolder = Path.Combine(FileExtensions.FindVSTemplateFolder(), solutionTemplate.LanguageTag.GetTemplateFolderNameByLanguage());
-                if (!vsFolder.DirectoryExists())
-                    vsFolder = FileExtensions.FindVSTemplateFolder();
+            //ct.ThrowIfCancellationRequested();
+            //if (autoImportToVS)
+            //{
+            //    _logger.LogDebug($"Importing zip file to VS template folder...");
+            //    var vsFolder = Path.Combine(FileExtensions.FindVSTemplateFolder(), solutionTemplate.LanguageTag.GetTemplateFolderNameByLanguage());
+            //    if (!vsFolder.DirectoryExists())
+            //        vsFolder = FileExtensions.FindVSTemplateFolder();
 
-                ct.ThrowIfCancellationRequested();
-                File.Copy(zipFileName, Path.Combine(vsFolder, Path.GetFileName(zipFileName)), true);
-            }
+            //    ct.ThrowIfCancellationRequested();
+            //    File.Copy(zipFileName, Path.Combine(vsFolder, Path.GetFileName(zipFileName)), true);
+            //}
         }
 
         public IEnumerable<IProjectTemplate> GetProjectTemplatesFromFolder(string destFolder)

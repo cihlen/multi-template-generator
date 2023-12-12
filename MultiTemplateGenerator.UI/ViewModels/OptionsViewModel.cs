@@ -1,5 +1,6 @@
-﻿using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
+﻿
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using MultiTemplateGenerator.UI.Helpers;
 
@@ -28,13 +29,13 @@ namespace MultiTemplateGenerator.UI.ViewModels
         public bool AutoExpand
         {
             get => _autoExpand;
-            set { _autoExpand = value; RaisePropertyChanged(); }
+            set { _autoExpand = value; OnPropertyChanged(); }
         }
 
         public bool CopyPropertiesFromSolution
         {
             get => _copyPropertiesFromSolution;
-            set { _copyPropertiesFromSolution = value; RaisePropertyChanged(); }
+            set { _copyPropertiesFromSolution = value; OnPropertyChanged(); }
         }
 
         public bool IsDarkMode
@@ -44,7 +45,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 _isDarkMode = value;
                 ToggleDarkLightTheme(_isDarkMode);
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -54,20 +55,20 @@ namespace MultiTemplateGenerator.UI.ViewModels
             set
             {
                 _baseTheme = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
         public string ExcludedFolders
         {
             get => _excludedFolders;
-            set { _excludedFolders = value; RaisePropertyChanged(); }
+            set { _excludedFolders = value; OnPropertyChanged(); }
         }
 
         public string ExcludedFiles
         {
             get => _excludedFiles;
-            set { _excludedFiles = value; RaisePropertyChanged(); }
+            set { _excludedFiles = value; OnPropertyChanged(); }
         }
 
         public RelayCommand CloseCommand => _closeCommand ??= new RelayCommand(() =>

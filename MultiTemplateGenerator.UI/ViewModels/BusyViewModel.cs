@@ -1,8 +1,8 @@
-﻿using GalaSoft.MvvmLight;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MultiTemplateGenerator.UI.ViewModels
 {
-    public class BusyViewModel : ViewModelBase
+    public class BusyViewModel : ObservableObject
     {
         public GeneratorViewModel GeneratorVM { get; }
 

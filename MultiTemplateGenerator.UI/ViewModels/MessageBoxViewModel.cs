@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using MultiTemplateGenerator.UI.Helpers;
 using Icon = System.Drawing.Icon;

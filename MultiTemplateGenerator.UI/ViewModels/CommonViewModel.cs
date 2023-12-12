@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -12,7 +12,7 @@ using MultiTemplateGenerator.UI.Helpers;
 
 namespace MultiTemplateGenerator.UI.ViewModels
 {
-    public abstract class CommonViewModel : ViewModelBase
+    public abstract class CommonViewModel : ObservableObject
     {
         protected virtual ILogger Logger { get; }
 
@@ -129,12 +129,12 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         private RelayCommand<string> _openLocationCommand;
         public RelayCommand<string> OpenLocationCommand => _openLocationCommand
-            ??= new RelayCommand<string>(async (location) => await OpenLocationAsync(location), (location) => !IsInDesignMode /*&& location.DirectoryOrFileExists()*/);
+            ??= new RelayCommand<string>(async (location) => await OpenLocationAsync(location), (location) => !UIHelper.IsInDesignMode /*&& location.DirectoryOrFileExists()*/);
         protected async Task OpenLocationAsync(string location)
         {
             try
             {
-                if (IsInDesignMode)
+                if (UIHelper.IsInDesignMode)
                     return;
 
                 if (!location.DirectoryOrFileExists())
@@ -151,7 +151,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
         private RelayCommand<string> _executeFileCommand;
 
         public RelayCommand<string> ExecuteFileCommand => _executeFileCommand ??= new RelayCommand<string>(async (fileName) =>
-            await ExecuteFileAsync(fileName), (filePath) => !IsInDesignMode && filePath.FileExists());
+            await ExecuteFileAsync(fileName), (filePath) => !UIHelper.IsInDesignMode && filePath.FileExists());
 
         protected async Task ExecuteFileAsync(string fileName)
         {
@@ -191,7 +191,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public string BrowseForLocation(string path, string defaultFolder = null)
         {
-            if (IsInDesignMode)
+            if (UIHelper.IsInDesignMode)
                 return "";
 
             Logger?.LogDebug($"BrowseForLocation({path})");
@@ -214,7 +214,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public void BrowseForLocation(string path, string defaultFolder, Action<string> setAction)
         {
-            if (IsInDesignMode)
+            if (UIHelper.IsInDesignMode)
                 return;
 
             try
@@ -233,7 +233,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public string SelectFileFromSystem(string path, string defaultFolder, string title, string defaultExt, string filter)
         {
-            if (IsInDesignMode)
+            if (UIHelper.IsInDesignMode)
                 return "";
 
             Logger?.LogDebug($"SelectFileFromSystem({path})");

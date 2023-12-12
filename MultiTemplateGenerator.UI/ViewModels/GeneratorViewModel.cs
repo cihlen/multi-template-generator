@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.Logging;
 using MultiTemplateGenerator.UI.Models;
@@ -82,7 +82,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             set
             {
                 _isAppMenuOpen = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -96,7 +96,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             private set
             {
                 _projectTemplateCount = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -106,7 +106,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             private set
             {
                 _solutionFolderCount = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -154,9 +154,9 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     return;
 
                 _outputPath = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(TemplateTargetFolder));
-                RaisePropertyChanged(nameof(SolutionTemplateFullPath));
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TemplateTargetFolder));
+                OnPropertyChanged(nameof(SolutionTemplateFullPath));
             }
         }
 
@@ -166,7 +166,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             set
             {
                 _solutionFile = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 SetSolutionItems();
             }
@@ -182,9 +182,9 @@ namespace MultiTemplateGenerator.UI.ViewModels
             private set
             {
                 _solutionTemplate = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
-                RaisePropertyChanged(nameof(SolutionTemplateFullPath));
+                OnPropertyChanged(nameof(SolutionTemplateFullPath));
             }
         }
 
@@ -204,7 +204,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
         public bool IsWindowOpen
         {
             get => _isWindowOpen;
-            set => Set(ref _isWindowOpen, value);
+            set => SetProperty(ref _isWindowOpen, value);
         }
 
         public string CurrentVSTemplateFolder
@@ -213,7 +213,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             private set
             {
                 _currentVsTemplateFolder = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -223,7 +223,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             set
             {
                 _autoImportToVS = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -233,7 +233,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             set
             {
                 _autoOpenTemplate = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -330,8 +330,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
             {
                 if (propertyName.Equals(nameof(template.TemplateName)))
                 {
-                    RaisePropertyChanged(nameof(TemplateTargetFolder));
-                    RaisePropertyChanged(nameof(SolutionTemplateFullPath));
+                    OnPropertyChanged(nameof(TemplateTargetFolder));
+                    OnPropertyChanged(nameof(SolutionTemplateFullPath));
                 }
                 else if (propertyName.Equals(nameof(template.LanguageTag)))
                 {
@@ -347,7 +347,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public RelayCommand BrowseSolution => _browseSolution ??= new RelayCommand(() =>
         {
-            if (IsInDesignMode)
+            if (UIHelper.IsInDesignMode)
                 return;
 
             var filePath = SelectFileFromSystem(SolutionFile,
@@ -361,7 +361,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public RelayCommand BrowseDestinationFolder => _browseDestinationFolder ??= new RelayCommand(() =>
         {
-            if (IsInDesignMode)
+            if (UIHelper.IsInDesignMode)
                 return;
 
             var folder = BrowseForLocation(OutputPath);
@@ -402,11 +402,11 @@ namespace MultiTemplateGenerator.UI.ViewModels
 
         public RelayCommand<string> DeleteFolderContentCommand => _deleteFolderContentCommand ??=
             new RelayCommand<string>(async (location) => await DeleteFolderContent(location),
-                (location) => !IsInDesignMode && !IsBusy && location.DirectoryExists());
+                (location) => !UIHelper.IsInDesignMode && !IsBusy && location.DirectoryExists());
 
         public RelayCommand<string> PackageTemplateCommand => _packageTemplateCommand ??=
             new RelayCommand<string>(async (location) => await PackageTemplateContent(location),
-                (location) => !IsInDesignMode && !IsBusy && location.DirectoryExists());
+                (location) => !UIHelper.IsInDesignMode && !IsBusy && location.DirectoryExists());
 
         public RelayCommand<string> OpenDialogCommand => _openDialogCommand ??= new RelayCommand<string>(
             async (dialogName) => await OpenAppDialog(dialogName),
@@ -570,7 +570,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
             }
             finally
             {
-                RaisePropertyChanged(nameof(ProjectItems));
+                OnPropertyChanged(nameof(ProjectItems));
                 SetProjectCounts();
             }
         }
@@ -643,7 +643,7 @@ namespace MultiTemplateGenerator.UI.ViewModels
                     SetError($"Error canceling: {e.Message}");
                 }
 
-                CloseWindowCommand.RaiseCanExecuteChanged();
+                CloseWindowCommand.NotifyCanExecuteChanged();
             });
         }
 
@@ -664,15 +664,15 @@ namespace MultiTemplateGenerator.UI.ViewModels
         {
             InvokeHelper.Invoke(() =>
             {
-                RaisePropertyChanged(nameof(IsBusy));
-                RaisePropertyChanged(nameof(IsWindowOpen));
+                OnPropertyChanged(nameof(IsBusy));
+                OnPropertyChanged(nameof(IsWindowOpen));
 
-                OpenProjectDetailsCommand.RaiseCanExecuteChanged();
-                CloseWindowCommand.RaiseCanExecuteChanged();
-                GenerateTemplatesCommand.RaiseCanExecuteChanged();
-                SolutionTemplate.BrowseIcon.RaiseCanExecuteChanged();
-                SolutionTemplate.BrowsePreviewImage.RaiseCanExecuteChanged();
-                BrowseDestinationFolder.RaiseCanExecuteChanged();
+                OpenProjectDetailsCommand.NotifyCanExecuteChanged();
+                CloseWindowCommand.NotifyCanExecuteChanged();
+                GenerateTemplatesCommand.NotifyCanExecuteChanged();
+                SolutionTemplate.BrowseIcon.NotifyCanExecuteChanged();
+                SolutionTemplate.BrowsePreviewImage.NotifyCanExecuteChanged();
+                BrowseDestinationFolder.NotifyCanExecuteChanged();
             });
         }
 
@@ -805,8 +805,8 @@ namespace MultiTemplateGenerator.UI.ViewModels
                 DisposeCancelSource();
                 IsBusy = false;
                 CloseBusyWindow();
-                RaisePropertyChanged(nameof(TemplateTargetFolder));
-                RaisePropertyChanged(nameof(SolutionTemplateFullPath));
+                OnPropertyChanged(nameof(TemplateTargetFolder));
+                OnPropertyChanged(nameof(SolutionTemplateFullPath));
                 SetProjectCounts();
             }
         }

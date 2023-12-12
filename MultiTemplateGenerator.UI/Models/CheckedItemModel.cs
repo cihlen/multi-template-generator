@@ -1,5 +1,5 @@
 ﻿using System;
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MultiTemplateGenerator.UI.Models
 {
@@ -30,7 +30,7 @@ namespace MultiTemplateGenerator.UI.Models
                     return;
 
                 _isChecked = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 if (!string.IsNullOrEmpty(Text))
                     _checkedChanged?.Invoke(this);
@@ -40,7 +40,7 @@ namespace MultiTemplateGenerator.UI.Models
         public string Text
         {
             get => _text;
-            set { _text = value; RaisePropertyChanged(); }
+            set { _text = value; OnPropertyChanged(); }
         }
 
         public override string ToString()

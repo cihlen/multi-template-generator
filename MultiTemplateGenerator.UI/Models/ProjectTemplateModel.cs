@@ -5,16 +5,17 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MultiTemplateGenerator.UI.Properties;
 using MultiTemplateGenerator.Lib;
 using MultiTemplateGenerator.Lib.Models;
 using MultiTemplateGenerator.UI.Helpers;
+using System.ComponentModel;
 
 namespace MultiTemplateGenerator.UI.Models
 {
-    public class ProjectTemplateModel : ViewModelBase, IChecked, IProjectTemplate
+    public class ProjectTemplateModel : ObservableObject, IChecked, IProjectTemplate
     {
         private readonly Action<ProjectTemplateModel, string> _propertyChanged;
         private RelayCommand _browseIcon;
@@ -103,7 +104,7 @@ namespace MultiTemplateGenerator.UI.Models
             internal set
             {
                 _isBusy = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -116,7 +117,7 @@ namespace MultiTemplateGenerator.UI.Models
                     return;
 
                 _isChecked = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
                 
                 foreach (var child in Children.Cast<ProjectTemplateModel>())
                 {
@@ -135,7 +136,7 @@ namespace MultiTemplateGenerator.UI.Models
         public void SetParentChecked(bool isChecked)
         {
             _isChecked = isChecked;
-            RaisePropertyChanged(nameof(IsChecked));
+            OnPropertyChanged(nameof(IsChecked));
 
             Parent?.SetParentChecked(isChecked);
         }
@@ -149,7 +150,7 @@ namespace MultiTemplateGenerator.UI.Models
                     return;
 
                 _isMainProject = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 //foreach (var child in Children.Cast<ProjectTemplateModel>())
                 //{
@@ -168,31 +169,31 @@ namespace MultiTemplateGenerator.UI.Models
         public int SortOrder
         {
             get => _sortOrder;
-            set { _sortOrder = value; RaisePropertyChanged(); }
+            set { _sortOrder = value; OnPropertyChanged(); }
         }
 
         public bool CreateNewFolder
         {
             get => _createNewFolder;
-            set { _createNewFolder = value; RaisePropertyChanged(); }
+            set { _createNewFolder = value; OnPropertyChanged(); }
         }
 
         public string FrameworkVersion
         {
             get => _frameworkVersion;
-            set { _frameworkVersion = value; RaisePropertyChanged(); }
+            set { _frameworkVersion = value; OnPropertyChanged(); }
         }
 
         public string RequiredFrameworkVersion
         {
             get => _requiredFrameworkVersion;
-            set { _requiredFrameworkVersion = value; RaisePropertyChanged(); }
+            set { _requiredFrameworkVersion = value; OnPropertyChanged(); }
         }
 
         public string MaxFrameworkVersion
         {
             get => _maxFrameworkVersion;
-            set { _maxFrameworkVersion = value; RaisePropertyChanged(); }
+            set { _maxFrameworkVersion = value; OnPropertyChanged(); }
         }
 
         public Array LocationFieldTypes => Enum.GetValues(typeof(LocationFieldType));
@@ -200,25 +201,25 @@ namespace MultiTemplateGenerator.UI.Models
         public bool ProvideDefaultName
         {
             get => _provideDefaultName;
-            set { _provideDefaultName = value; RaisePropertyChanged(); }
+            set { _provideDefaultName = value; OnPropertyChanged(); }
         }
 
         public bool CreateInPlace
         {
             get => _createInPlace;
-            set { _createInPlace = value; RaisePropertyChanged(); }
+            set { _createInPlace = value; OnPropertyChanged(); }
         }
 
         public bool EnableLocationBrowseButton
         {
             get => _enableLocationBrowseButton;
-            set { _enableLocationBrowseButton = value; RaisePropertyChanged(); }
+            set { _enableLocationBrowseButton = value; OnPropertyChanged(); }
         }
 
         public LocationFieldType LocationField
         {
             get => _locationField;
-            set { _locationField = value; RaisePropertyChanged(); }
+            set { _locationField = value; OnPropertyChanged(); }
         }
 
         public string ProjectFileName
@@ -230,14 +231,14 @@ namespace MultiTemplateGenerator.UI.Models
                 if (!string.IsNullOrWhiteSpace(_projectFileName) && string.IsNullOrEmpty(LanguageTag))
                     LanguageTag = _projectFileName.GetLanguageTagFromExtension();
 
-                RaisePropertyChanged(nameof(ProjectType));
+                OnPropertyChanged(nameof(ProjectType));
             }
         }
 
         public ImageSource ItemImage
         {
             get => _itemImage;
-            private set { _itemImage = value; RaisePropertyChanged(); }
+            private set { _itemImage = value; OnPropertyChanged(); }
         }
 
         public string TemplateName
@@ -249,10 +250,10 @@ namespace MultiTemplateGenerator.UI.Models
                     return;
 
                 _templateName = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 TemplateFileName = TemplateName.GetSafeFileName() + ".vstemplate";
-                RaisePropertyChanged(nameof(TemplateFileName));
+                OnPropertyChanged(nameof(TemplateFileName));
 
                 _propertyChanged?.Invoke(this, nameof(TemplateName));
             }
@@ -261,7 +262,7 @@ namespace MultiTemplateGenerator.UI.Models
         public string TemplateFileName
         {
             get => _templateFileName;
-            set { _templateFileName = value; RaisePropertyChanged(); }
+            set { _templateFileName = value; OnPropertyChanged(); }
         }
 
         public string Description
@@ -274,14 +275,14 @@ namespace MultiTemplateGenerator.UI.Models
                 {
                     _description = "<No description available>";
                 }
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
         public string DefaultName
         {
             get => _defaultName;
-            set { _defaultName = value; RaisePropertyChanged(); }
+            set { _defaultName = value; OnPropertyChanged(); }
         }
 
         public string ProjectType => ProjectFileName.GetProjectTypeFromExtension() ?? LanguageTag.GetProjectTypeFromExtension();
@@ -295,9 +296,9 @@ namespace MultiTemplateGenerator.UI.Models
                     return;
 
                 _languageTag = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
-                RaisePropertyChanged(nameof(ProjectType));
+                OnPropertyChanged(nameof(ProjectType));
                 _propertyChanged?.Invoke(this, nameof(LanguageTag));
             }
         }
@@ -305,7 +306,7 @@ namespace MultiTemplateGenerator.UI.Models
         public ObservableCollection<CheckedItemModel> PlatformTagsList
         {
             get => _platformTagsList;
-            set { _platformTagsList = value; RaisePropertyChanged(); }
+            set { _platformTagsList = value; OnPropertyChanged(); }
         }
 
         public string PlatformTags
@@ -317,10 +318,10 @@ namespace MultiTemplateGenerator.UI.Models
                     return;
 
                 _platformTags = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 PlatformTagsList.GetNewCheckedItems(_platformTags, PlatformTagCheckedChanged);
-                RaisePropertyChanged(nameof(PlatformTagsList));
+                OnPropertyChanged(nameof(PlatformTagsList));
             }
         }
 
@@ -332,7 +333,7 @@ namespace MultiTemplateGenerator.UI.Models
         public ObservableCollection<CheckedItemModel> ProjectTypeTagsList
         {
             get => _projectTypeTagsList;
-            set { _projectTypeTagsList = value; RaisePropertyChanged(); }
+            set { _projectTypeTagsList = value; OnPropertyChanged(); }
         }
 
         public string ProjectTypeTags
@@ -344,10 +345,10 @@ namespace MultiTemplateGenerator.UI.Models
                     return;
 
                 _projectTypeTags = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 ProjectTypeTagsList.GetNewCheckedItems(_projectTypeTags, ProjectTypeTagCheckedChanged);
-                RaisePropertyChanged(nameof(ProjectTypeTagsList));
+                OnPropertyChanged(nameof(ProjectTypeTagsList));
             }
         }
 
@@ -359,7 +360,7 @@ namespace MultiTemplateGenerator.UI.Models
         public string ProjectSubType
         {
             get => _projectSubType;
-            set { _projectSubType = value; RaisePropertyChanged(); }
+            set { _projectSubType = value; OnPropertyChanged(); }
         }
 
         public ImageSource IconImageSource
@@ -368,7 +369,7 @@ namespace MultiTemplateGenerator.UI.Models
             private set
             {
                 _iconImageSource = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
                 SetItemImage();
             }
         }
@@ -379,7 +380,7 @@ namespace MultiTemplateGenerator.UI.Models
             set
             {
                 _iconImagePath = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 InvokeHelper.Invoke(() =>
                 {
@@ -391,7 +392,7 @@ namespace MultiTemplateGenerator.UI.Models
         public ImageSource PreviewImageSource
         {
             get => _previewImageSource;
-            private set { _previewImageSource = value; RaisePropertyChanged(); }
+            private set { _previewImageSource = value; OnPropertyChanged(); }
         }
 
         public string PreviewImagePath
@@ -400,7 +401,7 @@ namespace MultiTemplateGenerator.UI.Models
             set
             {
                 _previewImagePath = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 InvokeHelper.Invoke(() =>
                 {
@@ -412,7 +413,7 @@ namespace MultiTemplateGenerator.UI.Models
         public bool IsHidden
         {
             get => _isHidden;
-            set { _isHidden = value; RaisePropertyChanged(); }
+            set { _isHidden = value; OnPropertyChanged(); }
         }
 
         public bool IsProject { get; }
@@ -424,7 +425,7 @@ namespace MultiTemplateGenerator.UI.Models
 
         public RelayCommand BrowseIcon => _browseIcon ??= new RelayCommand(() =>
         {
-            if (IsInDesignMode)
+            if (UIHelper.IsInDesignMode)
                 return;
 
             if (_openImageDialog.ShowDialogPath(IconImagePath) != DialogResult.OK)
@@ -435,7 +436,7 @@ namespace MultiTemplateGenerator.UI.Models
 
         public RelayCommand BrowsePreviewImage => _browsePreviewImage ??= new RelayCommand(() =>
         {
-            if (IsInDesignMode)
+            if (UIHelper.IsInDesignMode)
                 return;
 
             if (_openImageDialog.ShowDialogPath(PreviewImagePath) != DialogResult.OK)
