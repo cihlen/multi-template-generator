@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MultiTemplateGenerator.Lib.Generator;
 using MultiTemplateGenerator.UI.Helpers;
 
@@ -11,14 +12,23 @@ namespace MultiTemplateGenerator.UI.ViewModels
     /// </summary>
     public class ViewModelLocator
     {
+        private static bool _initialized;
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
         public ViewModelLocator()
         {
+            if (_initialized)
+            {
+                return;
+            }
+            _initialized = true;
+
+            var loggerFactory = LoggerHelper.GetLoggerFactory();
 
             var serviceCollection = new ServiceCollection()
-               .AddSingleton(LoggerHelper.GetLoggerFactory())
+               .AddSingleton(loggerFactory.CreateLogger<GeneratorViewModel>())
+               .AddSingleton(loggerFactory.CreateLogger<TemplateGeneratorService>())
                .AddSingleton<GeneratorViewModel>()
                .AddSingleton<ITemplateGeneratorService, TemplateGeneratorService>()
                .AddSingleton<ITemplateRepository, TemplateRepository>()

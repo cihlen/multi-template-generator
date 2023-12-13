@@ -61,8 +61,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\MultiTemplateGenerator.SharedFiles\Resources\MTGPackage.ico">
-      <Link>Resources\MTGPackage.ico</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>MTGPackage.ico</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\MultiTemplateGenerator.SharedFiles\Resources\MultiTemplateGenerator.png">
@@ -121,7 +120,7 @@
   <ItemGroup>
     <VSCTCompile Include="..\MultiTemplateGenerator.SharedFiles\MTGPackage.vsct">
       <Link>MTGPackage.vsct</Link>
-	  <ResourceName>Menus.ctmenu</ResourceName>
+      <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
     <Content Include="..\MultiTemplateGenerator.SharedFiles\Multi-Template_Generator_Window.png">
       <Link>Multi-Template_Generator_Window.png</Link>

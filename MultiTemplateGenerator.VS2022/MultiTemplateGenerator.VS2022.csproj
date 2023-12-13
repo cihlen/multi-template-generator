@@ -12,6 +12,9 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\MultiTemplateGenerator.SharedFiles\Resources\MTGPackage.ico</ApplicationIcon>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -53,7 +56,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VSPackage.Designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\MultiTemplateGenerator.SharedFiles\Resources\Command1.png">
@@ -61,8 +63,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\MultiTemplateGenerator.SharedFiles\Resources\MTGPackage.ico">
-      <Link>Resources\MTGPackage.ico</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>MTGPackage.ico</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\MultiTemplateGenerator.SharedFiles\Resources\MultiTemplateGenerator.png">
