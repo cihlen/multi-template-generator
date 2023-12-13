@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.VS", "MultiTemplateGenerator.VS\MultiTemplateGenerator.VS.csproj", "{7E54FF91-BA8E-443F-B83C-876707B7A1A4}"
 EndProject
@@ -17,6 +17,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.UI", "MultiTemplateGenerator.UI\MultiTemplateGenerator.UI.csproj", "{195B977C-1282-4DD9-960D-6ED7D7C40E1F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTemplateGenerator.App", "MultiTemplateGenerator.App\MultiTemplateGenerator.App.csproj", "{A69083B0-A649-4350-BC9A-BAD712246477}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MultiTemplateGenerator.VS.Shared", "MultiTemplateGenerator.VS.Shared\MultiTemplateGenerator.VS.Shared.shproj", "{2A343F24-6A59-4D77-AAB1-1E6A1FB5FADD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,5 +52,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D50E3CE-6BD3-4290-8C3E-76F5D2301A88}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		MultiTemplateGenerator.VS.Shared\MultiTemplateGenerator.VS.Shared.projitems*{2a343f24-6a59-4d77-aab1-1e6a1fb5fadd}*SharedItemsImports = 13
+		MultiTemplateGenerator.VS.Shared\MultiTemplateGenerator.VS.Shared.projitems*{7e54ff91-ba8e-443f-b83c-876707b7a1a4}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

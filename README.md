@@ -22,12 +22,12 @@ The source code also includes a WPF project so the Generator can also be execute
 2. Generate solution template and copy template icon and preview image to output directory.
 3. Copy all files and sub-folders for each project to %OUTPUTDIR%\%TEMPLATE-NAME% directory.
 4. Create zip file: %OUTPUTDIR%\%SOLUTION-TEMPLATE-NAME%.zip
-5. Optionally copies the zip file to Visual Studio Project Temlpates directory.
+5. Optionally copies the zip file to Visual Studio Project Templates directory.
 
 ##### Microsoft's documentation can be found here:
 Reference: https://docs.microsoft.com/en-us/visualstudio/extensibility/visual-studio-template-schema-reference
 
-Tempalte Data: https://docs.microsoft.com/en-us/visualstudio/extensibility/templatedata-element-visual-studio-templates
+Template Data: https://docs.microsoft.com/en-us/visualstudio/extensibility/templatedata-element-visual-studio-templates
 
 Project template: https://docs.microsoft.com/en-us/visualstudio/extensibility/project-element-visual-studio-templates
 

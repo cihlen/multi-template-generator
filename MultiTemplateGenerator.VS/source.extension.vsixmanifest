@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="MultiTemplateGenerator.1a4e9a58-e41a-4622-80b7-d5f60d6b56d8" Version="0.56" Language="en-US" Publisher="Hans Christian Ihlen" />
+        <Identity Id="MultiTemplateGenerator.1a4e9a58-e41a-4622-80b7-d5f60d6b56d8" Version="0.57" Language="en-US" Publisher="Hans Christian Ihlen-Abelson" />
         <DisplayName>Multi-Template Generator</DisplayName>
         <Description xml:space="preserve">Multi-project template generator for solutions and existing project templates.</Description>
         <MoreInfo>https://github.com/cihlen/multi-template-generator</MoreInfo>
         <License>LICENSE</License>
         <GettingStartedGuide>https://github.com/cihlen/multi-template-generator#readme</GettingStartedGuide>
         <ReleaseNotes>https://github.com/cihlen/multi-template-generator#readme</ReleaseNotes>
-        <Icon>Resources\MTGPackage.ico</Icon>
+        <Icon>MTGPackage.ico</Icon>
         <PreviewImage>Multi-Template_Generator_Window.png</PreviewImage>
         <Tags>template templates project projects solution solutions multi generator</Tags>
     </Metadata>
