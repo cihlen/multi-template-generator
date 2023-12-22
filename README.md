@@ -1,5 +1,5 @@
 # Multi-Template Generator
-##### Multi-template generator for Visual Studio 2019
+##### Multi-template generator for Visual Studio 2019/2022
 
 Visual Studio add-in for generating solution templates (Project Collections) for existing solutions and existing project templates.
 
